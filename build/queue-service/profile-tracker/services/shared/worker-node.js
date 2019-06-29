@@ -36,7 +36,6 @@ const start = async (config) => {
                     },
                     isEnabled: getConfig('AWS_ENABLE_BACKUP'),
                 }
-                console.log(getConfig('AWS_ENABLE_BACKUP'))
             }
         })
 
