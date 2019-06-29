@@ -1,0 +1,279 @@
+Description: >
+
+    cerberus stack
+
+    Last Modified: 27th June 2019
+    Author: Ali Alfredji <ali@mysocial.io>
+
+Parameters:
+
+    EnvironmentType:
+        Type: String
+        AllowedValues:
+            - dev
+            - stage
+            - prod
+
+    EnvironmentMode:
+        Type: String
+        Default: boot
+        AllowedValues:
+            - boot
+            - init
+            - up
+    
+    NetworkVPCId:
+        Description: On what vpc will the resources run
+        Type: String
+        NoEcho: true
+    
+    NetworkSubnetId:
+        Description: Where the network will be running
+        Type: String
+        NoEcho: true
+
+    EC2KeyPairName:
+        Description: certificate to access EC2 machines
+        Type: String
+        NoEcho: true
+
+    S3TemplateRoot:
+        Description: How to resolve sub-stack templates
+        Type: String
+        NoEcho: true
+
+    QueueDbPassword:
+        Description: password for scraper's postgres database
+        Type: String
+        NoEcho: true
+
+Mappings:
+
+    EnvironmentMap:
+        dev:
+            QueuePgEbsSize: 25
+            QueuePgSnapshotId: false
+            QueuePgInstanceType: t3.small
+            QueuePgBackupSchedule: "@yearly"
+
+            DiscoverySize:              2
+            DiscoveryScale:             1
+            DiscoveryMachine:           t3.nano
+
+            FirstBloodSize:             2
+            FirstBloodScale:            1
+            FirstBloodMachine:          t3.nano
+
+            ProfileTrackerSize:         0
+            ProfileTrackerScale:        1
+            ProfileTrackerMachine:      t3.nano
+
+            PostTrackerSize:            1
+            PostTrackerScale:           2
+            PostTrackerMachine:         t3.micro
+        prod:
+            QueuePgEbsSize: 25
+            QueuePgSnapshotId: false
+            QueuePgInstanceType: t2.micro
+            QueuePgBackupSchedule: "@yearly"
+
+Conditions:
+    IsBootRun: !Or
+        - !Equals [ !Ref EnvironmentMode, boot ]
+        - !Equals [ !Ref EnvironmentMode, init ]
+        - !Equals [ !Ref EnvironmentMode, up ]
+    IsInitRun: !Or
+        - !Equals [ !Ref EnvironmentMode, init ]
+        - !Equals [ !Ref EnvironmentMode, up ]
+    IsUpdateRun: !Equals [ !Ref EnvironmentMode, up ]
+
+Resources:
+
+#
+#
+# Library Resources
+# =================================================================================================
+#
+
+    S3Buckets:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/lib/s3.yaml"
+            Parameters:
+                StackName:      !Ref AWS::StackName
+
+    IAMRoles:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/lib/iam.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                BackupsBucket:      !GetAtt S3Buckets.Outputs.Backups
+
+    SecurityGroups:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/lib/sg.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                VpcId:              !Ref NetworkVPCId
+
+    EBSVolumes:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/lib/ebs.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                QueuePgEbsSize:     !FindInMap [ EnvironmentMap, !Ref EnvironmentType, QueuePgEbsSize ]
+                QueuePgSnapshotId:  !FindInMap [ EnvironmentMap, !Ref EnvironmentType, QueuePgSnapshotId ]
+
+#
+#
+# Service Resources
+# =================================================================================================
+#
+
+    QueuePG:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/services/queue-pg.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                SubnetId:           !Ref NetworkSubnetId
+                SecurityGroup:      !GetAtt SecurityGroups.Outputs.GenericPostgres
+                EC2KeyPairName:     !Ref EC2KeyPairName
+                InstanceType:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, QueuePgInstanceType ]
+                EBSVolume:          !GetAtt EBSVolumes.Outputs.QueuePgVolume
+                
+                # download codebase
+                S3ReadOnlyRole:     !GetAtt IAMRoles.Outputs.S3ReadOnly
+                S3Bucket:           !GetAtt S3Buckets.Outputs.CodeArtifacts
+                CodeArtifact:       !Sub queue-pg
+                # container props
+                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
+                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
+                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+                BackupS3Prefix:     !Sub queue-pg-${EnvironmentType}
+                BackupSchedule:     !FindInMap [ EnvironmentMap, !Ref EnvironmentType, QueuePgBackupSchedule ]
+                PGPassword:         !Ref QueueDbPassword           
+
+    ServiceDiscovery:
+        Type: AWS::CloudFormation::Stack
+        Condition: IsUpdateRun
+        DependsOn: QueuePG
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/services/queue-service.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                SecurityGroup:      !GetAtt SecurityGroups.Outputs.GenericService
+                EC2KeyPairName:     !Ref EC2KeyPairName
+                InstanceType:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, DiscoveryMachine ]
+                
+                # download service codebase
+                S3ReadOnlyRole:     !GetAtt IAMRoles.Outputs.S3ReadOnly
+                S3Bucket:           !GetAtt S3Buckets.Outputs.CodeArtifacts
+                CodeArtifact:       !Sub queue-service
+
+                # autoscaling
+                DesiredCapacity:    !FindInMap [ EnvironmentMap, !Ref EnvironmentType, DiscoverySize ]
+                MaxCapacity:        10
+
+                # service enviroment variables
+                ServiceName:        discovery
+                ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, DiscoveryScale ]
+                PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                PGPassword:         !Ref QueueDbPassword
+                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
+                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
+                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+
+    ServiceFirstBlood:
+        Type: AWS::CloudFormation::Stack
+        Condition: IsUpdateRun
+        DependsOn: QueuePG
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/services/queue-service.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                SecurityGroup:      !GetAtt SecurityGroups.Outputs.GenericService
+                EC2KeyPairName:     !Ref EC2KeyPairName
+                InstanceType:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, FirstBloodMachine ]
+                
+                # download service codebase
+                S3ReadOnlyRole:     !GetAtt IAMRoles.Outputs.S3ReadOnly
+                S3Bucket:           !GetAtt S3Buckets.Outputs.CodeArtifacts
+                CodeArtifact:       !Sub queue-service
+
+                # autoscaling
+                DesiredCapacity:    !FindInMap [ EnvironmentMap, !Ref EnvironmentType, FirstBloodSize ]
+                MaxCapacity:        10
+
+                # service enviroment variables
+                ServiceName:        first-blood
+                ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, FirstBloodScale ]
+                PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                PGPassword:         !Ref QueueDbPassword
+                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
+                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
+                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+
+    ServiceProfileTracker:
+        Type: AWS::CloudFormation::Stack
+        Condition: IsUpdateRun
+        DependsOn: QueuePG
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/services/queue-service.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                SecurityGroup:      !GetAtt SecurityGroups.Outputs.GenericService
+                EC2KeyPairName:     !Ref EC2KeyPairName
+                InstanceType:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, ProfileTrackerMachine ]
+                
+                # download service codebase
+                S3ReadOnlyRole:     !GetAtt IAMRoles.Outputs.S3ReadOnly
+                S3Bucket:           !GetAtt S3Buckets.Outputs.CodeArtifacts
+                CodeArtifact:       !Sub queue-service
+
+                # autoscaling
+                DesiredCapacity:    !FindInMap [ EnvironmentMap, !Ref EnvironmentType, ProfileTrackerSize ]
+                MaxCapacity:        10
+
+                # service enviroment variables
+                ServiceName:        profile-tracker
+                ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, ProfileTrackerScale ]
+                PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                PGPassword:         !Ref QueueDbPassword
+                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
+                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
+                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+
+    ServicePostTracker:
+        Type: AWS::CloudFormation::Stack
+        Condition: IsUpdateRun
+        DependsOn: QueuePG
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/services/queue-service.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                SecurityGroup:      !GetAtt SecurityGroups.Outputs.GenericService
+                EC2KeyPairName:     !Ref EC2KeyPairName
+                InstanceType:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, PostTrackerMachine ]
+                
+                # download service codebase
+                S3ReadOnlyRole:     !GetAtt IAMRoles.Outputs.S3ReadOnly
+                S3Bucket:           !GetAtt S3Buckets.Outputs.CodeArtifacts
+                CodeArtifact:       !Sub queue-service
+
+                # autoscaling
+                DesiredCapacity:    !FindInMap [ EnvironmentMap, !Ref EnvironmentType, PostTrackerSize ]
+                MaxCapacity:        10
+
+                # service enviroment variables
+                ServiceName:        post-tracker
+                ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, PostTrackerScale ]
+                PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                PGPassword:         !Ref QueueDbPassword
+                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
+                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
+                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+

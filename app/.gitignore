@@ -1,0 +1,21 @@
+# Environment Files
+!.env
+.env.*
+
+# Data Folders
+node_modules
+data
+release
+
+# Release Folder
+build/queue/.env.local
+build/queue/services
+
+# NPM Related Files
+yarn.lock
+yarn-error.log
+package-lock.json
+npm-debug.log
+
+# Stuff
+.vscode

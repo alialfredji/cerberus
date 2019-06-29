@@ -1,0 +1,50 @@
+version: '3.4'
+services:
+
+#
+# Infrastructure
+# - humble boot services
+# - humble drop services
+#
+
+    postgres:
+        image: fetchq/fetchq:10.4-1.3.0
+        ports:
+            - ${PG_PORT:-5432}:5432
+        networks:
+            - database
+        environment:
+            POSTGRES_USER: ${PG_USERNAME:-cerberus}
+            POSTGRES_PASSWORD: ${PG_PASSWORD:-cerberus}
+            POSTGRES_DB: ${PG_DATABASE:-cerberus}
+        volumes:
+            - ${HUMBLE_DATA}/pg:/var/lib/postgresql/data
+            - ${HUMBLE_BACKUP}:/backup
+        restart: always
+
+    # backup:
+    #     image: schickling/postgres-backup-s3
+    #     links:
+    #         - postgres
+    #     networks:
+    #         - database
+    #     environment:
+    #         SCHEDULE: ${BACKUP_SCHEDULE:-@hourly}
+    #         S3_REGION: ${S3_REGION:-xxx}
+    #         S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-xxx}
+    #         S3_SECRET_ACCESS_KEY: ${S3_ACCESS_SECRET:-xxx}
+    #         S3_BUCKET: ${S3_BUCKET:-xxx}
+    #         S3_PREFIX: ${S3_PREFIX:-xxx}
+    #         POSTGRES_HOST: ${PG_HOST:-postgres}
+    #         POSTGRES_DATABASE: ${PG_DATABASE-cerberus}
+    #         POSTGRES_USER: ${PG_USERNAME:-cerberus}
+    #         POSTGRES_PASSWORD: ${PG_PASSWORD:-cerberus}
+    #         #POSTGRES_EXTRA_OPTS: ${PG_EXTRA_OPTS-'--schema=public --blobs'}
+    #     restart: always
+
+#
+# Networks definition
+#
+
+networks:
+    database:

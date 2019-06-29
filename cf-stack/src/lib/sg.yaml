@@ -1,0 +1,69 @@
+Description: cerberus - security groups
+
+Parameters:
+
+    StackName:
+        Type: String
+
+    VpcId:
+        Description: where the network will run
+        Type: String
+
+Resources:
+
+    GenericPostgres:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription:
+                Fn::Join:
+                    - " - "
+                    - - !Ref StackName
+                      - generic-postgres
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 5432
+                  ToPort: 5432
+                  CidrIp: 0.0.0.0/0
+                - IpProtocol: tcp
+                  FromPort: 22
+                  ToPort: 22
+                  CidrIp: 0.0.0.0/0
+            VpcId: !Ref VpcId
+            Tags:
+                - Key: Name
+                  Value:
+                      Fn::Join:
+                          - "-"
+                          - - !Ref StackName
+                            - generic-postgres
+
+    GenericService:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription:
+                Fn::Join:
+                    - " - "
+                    - - !Ref StackName
+                      - generic-service
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 22
+                  ToPort: 22
+                  CidrIp: 0.0.0.0/0
+            VpcId: !Ref VpcId
+            Tags:
+                - Key: Name
+                  Value:
+                      Fn::Join:
+                          - "-"
+                          - - !Ref StackName
+                            - generic-service
+
+Outputs:
+
+    GenericPostgres:
+        Value: !Ref GenericPostgres
+
+    GenericService:
+        Value: !Ref GenericService
+

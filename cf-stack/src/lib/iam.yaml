@@ -1,0 +1,66 @@
+Description: cerberus - IAM Roles
+
+Parameters:
+
+    StackName:
+        Type: String
+
+    BackupsBucket:
+        Type: String
+
+Resources:
+
+    S3ReadOnly:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Statement:
+                - Effect: Allow
+                  Principal:
+                      Service: [ec2.amazonaws.com]
+                  Action: ['sts:AssumeRole']
+            Path: /
+            Policies:
+                - PolicyName: s3-full
+                  PolicyDocument:
+                      Statement:
+                      - Effect: Allow
+                        Action: ['s3:*' ] # need to fix it here :-)
+                        Resource: '*'
+
+    GenericIAMUser:
+        Type: AWS::IAM::User
+        Properties:
+            Path: /
+            Policies:
+                - PolicyName: !Sub ${StackName}-backups
+                  PolicyDocument:
+                    Version: '2012-10-17'
+                    Statement:
+                    - Effect: Allow
+                      Action:
+                        - s3:*
+                      Resource: 
+                        - !Sub arn:aws:s3:::${BackupsBucket}*
+                        - !Sub arn:aws:s3:::${BackupsBucket}/*
+
+    GenericAccessKey:
+        Type: AWS::IAM::AccessKey
+        Properties:
+            UserName:
+                Ref: GenericIAMUser
+
+
+Outputs:
+
+    S3ReadOnly:
+        Description: Allow a full read only to S3
+        Value: !Ref S3ReadOnly
+
+    GenericAccessKey:
+        Value: !Ref GenericAccessKey
+
+    GenericAccessSecret:
+        Value: !GetAtt GenericAccessKey.SecretAccessKey
+
+

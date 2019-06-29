@@ -1,0 +1,39 @@
+Description: cerberus - data volumes
+
+Parameters:
+
+    StackName:
+        Type: String
+
+    QueuePgEbsSize:
+        Description: Size of the postgres database
+        Type: Number
+
+    QueuePgSnapshotId:
+        Description: (optional) snapshot from where to restore a disk
+        Type: String
+
+Conditions:
+    IsQueuePgNewDisk: !Equals [ !Ref QueuePgSnapshotId, false ]
+
+Resources:
+
+    QueuePgVolume:
+        Type: AWS::EC2::Volume
+        Properties:
+            VolumeType: gp2
+            Size: !Ref QueuePgEbsSize
+            SnapshotId: 
+                Fn::If:
+                - IsQueuePgNewDisk
+                - Ref: AWS::NoValue
+                - Ref: QueuePgSnapshotId
+            AvailabilityZone: !Select [ 0, !GetAZs ]
+            Tags:
+                - Key: Name
+                  Value: !Sub "${StackName}-queue-pg"
+
+Outputs:
+
+    QueuePgVolume:
+        Value: !Ref QueuePgVolume

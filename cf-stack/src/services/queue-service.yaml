@@ -1,0 +1,168 @@
+Description: cerberus - service public cluster
+
+Parameters:
+
+    StackName:
+        Type: String
+    
+    SecurityGroup:
+        Type: String
+        Description: Security group to apply to the instances
+
+    EC2KeyPairName:
+        Description: The SSH KeyPair Name to allow access
+        Type: AWS::EC2::KeyPair::KeyName
+
+    CodeArtifact:
+        Description: path to code artifact in S3 bucket
+        Type: String
+
+    S3Bucket:
+        Description: Bucket from where to feth code
+        Type: String
+
+    S3ReadOnlyRole:
+        Type: String
+        Description: Should allow full read access to S3 artifacts bucket
+    
+    InstanceType:
+        Description: Which kind of EC2 machine to use
+        Type: String
+        Default: t2.nano
+
+    ServiceName:
+        Type: String
+
+    ServiceScale:
+        Type: Number
+        Default: 1
+
+    PostgresDNS:
+        Type: String
+
+    PGPassword:
+        Description: Postgres password
+        Type: String
+    
+    BackupAccessKey:
+        Type: String
+
+    BackupAccessSecret:
+        Type: String
+
+    BackupS3Bucket:
+        Type: String
+
+    DesiredCapacity:
+        Type: Number
+        Default: 1
+
+    MaxCapacity:
+        Type: Number
+        Default: 4
+
+    MinCapacity:
+        Type: Number
+        Default: 0
+
+Resources:
+
+    InstanceProfile:
+        Type: "AWS::IAM::InstanceProfile"
+        Properties:
+            Roles:
+                - !Ref S3ReadOnlyRole
+
+    LaunchConfig:
+        Type: AWS::AutoScaling::LaunchConfiguration
+        Properties:
+            InstanceType: !Ref InstanceType
+            ImageId: ami-f90a4880
+            KeyName: !Ref EC2KeyPairName
+            SecurityGroups:
+                - !Ref SecurityGroup
+            AssociatePublicIpAddress: true
+            IamInstanceProfile: !Ref InstanceProfile
+            UserData:
+                Fn::Base64:
+                    Fn::Sub: |
+                        #!/bin/bash
+                        # Version 0.0.1
+                        echo "init apt-get update" >> /home/ubuntu/init.txt 
+                        apt-get update -y
+                        echo "apt-get update done" >> /home/ubuntu/init.txt 
+                        # Install Docker
+                        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+                        echo "curl docker" >> /home/ubuntu/init.txt 
+                        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+                        echo "add-apt-repository" >> /home/ubuntu/init.txt 
+                        apt-get update -y
+                        # 20180418 - I had a proble with the docker install regarding some lock files
+                        # this seems to be a temporary solution, but in the end by updating the ec2 imageId
+                        # i go the thing to work.
+                        # Remove lock file
+                        # https://askubuntu.com/questions/15433/unable-to-lock-the-administration-directory-var-lib-dpkg-is-another-process
+                        # rm /var/lib/dpkg/lock
+                        # dpkg --configure -a
+                        echo "apt-get update -y" >> /home/ubuntu/init.txt 
+                        apt-cache policy docker-ce
+                        echo "apt-cache policy docker-ce" >> /home/ubuntu/init.txt 
+                        apt-get install -y docker-ce
+                        echo "apt-get install -y docker-ce" >> /home/ubuntu/init.txt 
+                        usermod -aG docker ubuntu
+                        echo "usermod -aG docker ubuntu" >> /home/ubuntu/init.txt 
+                        echo "docker installed" >> /home/ubuntu/init.txt 
+                        # Docker Compose
+                        curl -o /usr/local/bin/docker-compose -L "https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m)"
+                        chmod +x /usr/local/bin/docker-compose
+                        echo "docker-compose installed" >> /home/ubuntu/init.txt 
+                        # Humble CLI (need to fix the -y compatibility)
+                        git clone https://github.com/marcopeg/humble-cli.git /home/ubuntu/.humble-cli
+                        ln -s /home/ubuntu/.humble-cli/bin/humble.sh /usr/local/bin/humble
+                        echo "humble-cli installed" >> /home/ubuntu/init.txt
+                        # install Make
+                        sudo apt install make
+                        # Setup crawler
+                        apt install awscli -y
+                        echo "PG_PASSWORD=${PGPassword}" >> /home/ubuntu/.env.override
+                        echo "PG_HOST=${PostgresDNS}" >> /home/ubuntu/.env.override
+                        echo "AWS_SECRET_ACCESS_KEY=${BackupAccessSecret}" >> /home/ubuntu/.env.override
+                        echo "AWS_ACCESS_KEY=${BackupAccessKey}" >> /home/ubuntu/.env.override
+                        echo "AWS_BUCKET=${BackupS3Bucket}" >> /home/ubuntu/.env.override
+                        echo "AWS_REGION=${AWS::Region}" >> /home/ubuntu/.env.override
+                        echo "EC2_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)" >> /home/ubuntu/.env.override
+                        echo "wrote .env.override" >> /home/ubuntu/init.txt 
+                        # Pull codebase script
+                        echo "aws --region ${AWS::Region} s3 cp --recursive s3://${S3Bucket}/${CodeArtifact}/${ServiceName} /home/ubuntu" > /home/ubuntu/s3-pull.sh
+                        chmod +x /home/ubuntu/s3-pull.sh
+                        echo "pulled code from s3" >> /home/ubuntu/init.txt 
+                        # Scale script
+                        echo "humble up -d && sleep 60 && humble scale ${ServiceName}=${ServiceScale}" > /home/ubuntu/boot.sh
+                        chmod +x /home/ubuntu/boot.sh
+                        # Boot
+                        cd /home/ubuntu
+                        ./s3-pull.sh
+                        ./boot.sh
+                        
+    AutoScalingGroup:
+        Type: AWS::AutoScaling::AutoScalingGroup
+        Properties:
+            AutoScalingGroupName: !Sub "${StackName}-${ServiceName}"
+            LaunchConfigurationName: !Ref LaunchConfig
+            # VPCZoneIdentifier: !Ref SubnetIds
+            AvailabilityZones: 
+                Fn::GetAZs: 
+                    Ref: AWS::Region
+            DesiredCapacity: !Ref DesiredCapacity
+            MaxSize: !Ref MaxCapacity
+            MinSize: !Ref MinCapacity
+            Tags:
+                - Key: Name
+                  PropagateAtLaunch: true
+                  Value: !Sub "${StackName}-${CodeArtifact}-${ServiceName}"
+                - Key: generation
+                  Value: cerberus
+                  PropagateAtLaunch: true
+                - Key: role
+                  Value: worker
+                  PropagateAtLaunch: true

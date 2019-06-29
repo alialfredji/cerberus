@@ -1,0 +1,28 @@
+Description: cerberus - S3 buckets
+
+Parameters:
+
+    StackName:
+        Type: String
+
+Resources:
+
+    CodeArtifacts:
+        Type: AWS::S3::Bucket
+        Properties:
+            AccessControl: Private
+            BucketName: !Sub ${StackName}-code-artifacts
+
+    Backups:
+        Type: AWS::S3::Bucket
+        Properties:
+            AccessControl: Private
+            BucketName: !Sub ${StackName}-backups
+
+Outputs:
+
+    CodeArtifacts:
+        Value: !Ref CodeArtifacts
+    
+    Backups:
+        Value: !Ref Backups
