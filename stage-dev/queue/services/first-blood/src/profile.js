@@ -109,7 +109,7 @@ const handler = async (doc, { ctx, }) => {
     const profileNextIteration = profileNextIterationRules(data)
 
     // store response json in profile list if influencerr
-    if (rules.priority !== 1) {
+    if (rules.priority !== -1) {
         try {
             await storeJSON({
                 id: json.graphql.user.id + '/' + doc.subject,
