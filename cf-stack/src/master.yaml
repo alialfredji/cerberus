@@ -56,11 +56,32 @@ Mappings:
             QueuePgInstanceType: t3.micro
             QueuePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              1
+            DiscoverySize:              0
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             1
+            FirstBloodSize:             0
+            FirstBloodScale:            1
+            FirstBloodMachine:          t3.nano
+
+            ProfileTrackerSize:         0
+            ProfileTrackerScale:        1
+            ProfileTrackerMachine:      t3.nano
+
+            PostTrackerSize:            0
+            PostTrackerScale:           3
+            PostTrackerMachine:         t3.micro
+        prod:
+            QueuePgEbsSize: 30
+            QueuePgSnapshotId: false
+            QueuePgInstanceType: t3.medium
+            QueuePgBackupSchedule: "@yearly"
+
+            DiscoverySize:              4
+            DiscoveryScale:             1
+            DiscoveryMachine:           t3.nano
+
+            FirstBloodSize:             2
             FirstBloodScale:            1
             FirstBloodMachine:          t3.nano
 
@@ -69,13 +90,8 @@ Mappings:
             ProfileTrackerMachine:      t3.nano
 
             PostTrackerSize:            1
-            PostTrackerScale:           2
+            PostTrackerScale:           3
             PostTrackerMachine:         t3.micro
-        prod:
-            QueuePgEbsSize: 25
-            QueuePgSnapshotId: false
-            QueuePgInstanceType: t2.micro
-            QueuePgBackupSchedule: "@yearly"
 
 Conditions:
     IsBootRun: !Or

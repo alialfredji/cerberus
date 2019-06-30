@@ -46,19 +46,19 @@ while [ "$#" -ne 0 ] ; do
             ;;
         --ec2-key)
             STACK_EC2_KEY_PAIR_NAME="ParameterValue=${EC2_KEY_PAIR_NAME}"
-            shift 2
+            shift
             ;;
         --vpc-network)
             STACK_NETWORK_VPC="ParameterValue=${STACK_VPC}"
-            shift 2
+            shift
             ;;
         --vpc-subnet)
             STACK_NETWORK_SUBNET="ParameterValue=${STACK_VPC_SUBNET}"
-            shift 2
+            shift
             ;;
         --pg-pwd)
             QUEUE_DB_PASSWORD="ParameterValue=${QUEUE_DATABASE_PASSWORD}"
-            shift 2
+            shift
             ;;
         --no-sync)
             MODE_SYNC=false
