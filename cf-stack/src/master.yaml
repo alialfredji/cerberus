@@ -51,20 +51,20 @@ Mappings:
 
     EnvironmentMap:
         dev:
-            QueuePgEbsSize: 25
+            QueuePgEbsSize: 30
             QueuePgSnapshotId: false
-            QueuePgInstanceType: t3.small
+            QueuePgInstanceType: t3.micro
             QueuePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              2
+            DiscoverySize:              1
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             2
+            FirstBloodSize:             1
             FirstBloodScale:            1
             FirstBloodMachine:          t3.nano
 
-            ProfileTrackerSize:         0
+            ProfileTrackerSize:         1
             ProfileTrackerScale:        1
             ProfileTrackerMachine:      t3.nano
 

@@ -9,7 +9,7 @@ function help() {
 function syncQueueService() {
     TARGET=$1
     BUCKET="s3://${CODE_ARTIFACTS_BUCKET}/queue-service/${TARGET}"
-    SERVICE_PATH="${PWD}/build/queue-service/${TARGET}"
+    SERVICE_PATH="${PWD}/dk-stacks/queue-service/${TARGET}"
 
     # Check the service name
     if [ $TARGET = false ];
@@ -33,8 +33,8 @@ function syncQueueService() {
 
     # copy fresh sources
     echo "-- copy (${TARGET}) files"
-    cp -rf "${PWD}/app/services/shared" "${SERVICE_PATH}/services/shared"
-    cp -rf "${PWD}/app/services/${TARGET}" "${SERVICE_PATH}/services/${TARGET}"
+    cp -rf "${PWD}/stage-dev/queue/services/shared" "${SERVICE_PATH}/services/shared"
+    cp -rf "${PWD}/stage-dev/queue/services/${TARGET}" "${SERVICE_PATH}/services/${TARGET}"
 
     # clean node modules
     [ -d "${SERVICE_PATH}/services/${TARGET}/node_modules" ] && rm -rf "${SERVICE_PATH}/services/${TARGET}/node_modules"
@@ -49,7 +49,7 @@ function syncQueueService() {
 function syncQueuePG() {
     TARGET="queue-pg"
     BUCKET="s3://${CODE_ARTIFACTS_BUCKET}/${TARGET}"
-    SERVICE_PATH="${PWD}/build/${TARGET}"
+    SERVICE_PATH="${PWD}/dk-stacks/${TARGET}"
 
     echo "Deploy queue postgres database?"
     enterToContinue
