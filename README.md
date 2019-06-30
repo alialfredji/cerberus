@@ -57,11 +57,11 @@ Deploy service code artifacts to S3 bucket created by cf-stack:
 
 ## Change PG EC2 instance type
 
+* Modify `cf-stack/src/master.yml`, stop all running services linked to PG and deploy
 * Login to machine and run:
     ````
     make unmount-disk
     ````
-* Modify `cf-stack/src/master.yml`, stop all running services except PG and deploy
 * Modify `cf-stack/src/master.yml`, change PG ec2 instance type and deploy
 * Login to machine and run:
     ````
@@ -70,11 +70,11 @@ Deploy service code artifacts to S3 bucket created by cf-stack:
     ````
 ## Change PG EBS volume
 
+* Modify cf-stack master.yml, stop all running services linked to PG and deploy
 * Login to machine and run:
     ````
     make unmount-disk
     ````
-* Modify cf-stack master.yml, stop all running services except PG and deploy
 * Modify cf-stack master.yml, change PG ebs volume size (NOTE! only higher size than the previous is allowed) and deploy
 * Login to machine and run:
     ````
