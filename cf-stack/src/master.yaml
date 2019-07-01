@@ -77,20 +77,20 @@ Mappings:
             QueuePgInstanceType: t3.medium
             QueuePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              4
+            DiscoverySize:              5
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             2
+            FirstBloodSize:             5
             FirstBloodScale:            1
-            FirstBloodMachine:          t3.nano
+            FirstBloodMachine:          t3a.nano
 
             ProfileTrackerSize:         1
             ProfileTrackerScale:        1
-            ProfileTrackerMachine:      t3.nano
+            ProfileTrackerMachine:      t2.nano
 
             PostTrackerSize:            1
-            PostTrackerScale:           3
+            PostTrackerScale:           4
             PostTrackerMachine:         t3.micro
 
 Conditions:
