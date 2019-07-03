@@ -161,7 +161,7 @@ const handler = async (doc, { ctx, }) => {
     }
 
     // if profile turns private
-    if (profile.isPublic === false) {
+    if (data.isPublic === false) {
         ctx.logger.verbose(`[${workerName}] profile has turned PRIVATE`)
 
         return {
