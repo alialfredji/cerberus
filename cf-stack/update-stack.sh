@@ -90,7 +90,7 @@ STACK_PARAMS="${STACK_PARAMS} ParameterKey=EC2KeyPairName,${STACK_EC2_KEY_PAIR_N
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=NetworkVPCId,${STACK_NETWORK_VPC}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=NetworkSubnetId,${STACK_NETWORK_SUBNET}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=QueueDbPassword,${QUEUE_DB_PASSWORD}"
-STACK_PARAMS="${STACK_PARAMS} ParameterKey=StorageDbPassword,${QUEUE_DB_PASSWORD}"
+STACK_PARAMS="${STACK_PARAMS} ParameterKey=StorageDbPassword,${STORAGE_DB_PASSWORD}"
 
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=EnvironmentMode,${STACK_ENV_MODE}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=EnvironmentType,UsePreviousValue=true"
