@@ -5,6 +5,7 @@ const env = require('@forrestjs/service-env')
 const fetchq = require('fetchq')
 const moment = require('moment')
 const aws = require('aws-sdk')
+const pg = require('@forrestjs/service-postgres')
 
 require('../../shared/worker-node').start({
     libs: {
@@ -14,6 +15,7 @@ require('../../shared/worker-node').start({
         fetchq,
         hooks,
         aws,
+        pg,
     },
     queues: {
         'first_blood': {},

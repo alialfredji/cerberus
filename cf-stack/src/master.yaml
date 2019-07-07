@@ -51,9 +51,9 @@ Mappings:
 
     EnvironmentMap:
         dev:
-            QueuePgEbsSize: 30
+            QueuePgEbsSize: 3
             QueuePgSnapshotId: false
-            QueuePgInstanceType: t3.micro
+            QueuePgInstanceType: t3.nano
             QueuePgBackupSchedule: "@yearly"
 
             DiscoverySize:              0
@@ -62,14 +62,14 @@ Mappings:
 
             FirstBloodSize:             0
             FirstBloodScale:            1
-            FirstBloodMachine:          t3.nano
+            FirstBloodMachine:          t3a.nano
 
             ProfileTrackerSize:         0
             ProfileTrackerScale:        1
-            ProfileTrackerMachine:      t3.nano
+            ProfileTrackerMachine:      t2.nano
 
             PostTrackerSize:            0
-            PostTrackerScale:           3
+            PostTrackerScale:           4
             PostTrackerMachine:         t3.micro
         prod:
             QueuePgEbsSize: 30
@@ -77,19 +77,19 @@ Mappings:
             QueuePgInstanceType: t3.medium
             QueuePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              5
+            DiscoverySize:              0
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             5
+            FirstBloodSize:             0
             FirstBloodScale:            1
             FirstBloodMachine:          t3a.nano
 
-            ProfileTrackerSize:         2
+            ProfileTrackerSize:         0
             ProfileTrackerScale:        1
             ProfileTrackerMachine:      t2.nano
 
-            PostTrackerSize:            2
+            PostTrackerSize:            0
             PostTrackerScale:           4
             PostTrackerMachine:         t3.micro
 

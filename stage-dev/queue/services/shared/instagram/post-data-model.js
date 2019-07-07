@@ -118,7 +118,8 @@ const dataModelLocationAddress = (location) => {
 // data model
 const postDataModel = (json) => {
     const data = json.graphql.shortcode_media
-    const commentsJson = data.edge_media_to_comment || data.edge_media_preview_comment
+    const commentsJson = data.edge_media_to_comment || data.edge_media_preview_comment || data.edge_media_to_parent_comment
+    const commentsSecondJson = data.edge_media_to_parent_comment
     const caption = dataModelCaption(data)
     const sponsorsList = dataModelSponsorsList(data)
 
@@ -142,6 +143,7 @@ const postDataModel = (json) => {
             sponsorsList,
             taggedList: dataModelTaggedList(data, sponsorsList),
             commentsList: dataModelCommentsList(commentsJson),
+            commentsSecondList: dataModelCommentsList(commentsSecondJson),
             likesList: dataModelLikesList(data),
             hashtagsList: getHashtags(caption),
             ownerFullName: data.owner.full_name,
