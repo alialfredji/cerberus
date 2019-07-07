@@ -1,4 +1,4 @@
-const getErrorOrigin = require('../get-error-origin')
+const getErrorOrigin = require('./lib/get-error-origin')
 const getTextUsernames = require('./lib/get-text-usernames')
 const getProfileIdFromSponsor = require('./lib/get-profile-id-from-sponsor')
 const getHashtags = require('./lib/get-hashtags')
@@ -142,8 +142,8 @@ const postDataModel = (json) => {
             mentionsList: dataModelMentionsList(caption, sponsorsList),
             sponsorsList,
             taggedList: dataModelTaggedList(data, sponsorsList),
-            commentsList: dataModelCommentsList(commentsJson),
-            commentsSecondList: dataModelCommentsList(commentsSecondJson),
+            commentsList: commentsJson ? dataModelCommentsList(commentsJson) : [],
+            commentsSecondList: commentsSecondJson ? dataModelCommentsList(commentsSecondJson) : [],
             likesList: dataModelLikesList(data),
             hashtagsList: getHashtags(caption),
             ownerFullName: data.owner.full_name,

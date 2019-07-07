@@ -6,28 +6,28 @@ const query = (q, s) =>
 
 const putCountry = async (countryId, json) => {
     const q = [
-        'INSERT INTO ig_location (country_id, payload)',
-        'VALUES (:countryId, :value)'
+        'INSERT INTO ig_country (country_id, payload)',
+        'VALUES (:countryId, :payload)'
     ].join(' ')
 
     await query(q, {
         replacements: {
             countryId,
-            value: JSON.stringify(json),
+            payload: JSON.stringify(json),
         },
     })
 }
 
 const putCity = async (cityId, json) => {
     const q = [
-        'INSERT INTO ig_location (city_id, payload)',
-        'VALUES (:cityId, :value)'
+        'INSERT INTO ig_city (city_id, payload)',
+        'VALUES (:cityId, :payload)'
     ].join(' ')
 
     await query(q, {
         replacements: {
             cityId,
-            value: JSON.stringify(json),
+            payload: JSON.stringify(json),
         },
     })
 }
@@ -35,13 +35,13 @@ const putCity = async (cityId, json) => {
 const putLocation = async (locationId, json) => {
     const q = [
         'INSERT INTO ig_location (location_id, payload)',
-        'VALUES (:locationId, :value)'
+        'VALUES (:locationId, :payload)'
     ].join(' ')
 
     await query(q, {
         replacements: {
             locationId,
-            value: JSON.stringify(json),
+            payload: JSON.stringify(json),
         },
     })
 }
@@ -49,14 +49,14 @@ const putLocation = async (locationId, json) => {
 const putPost = async (profileId, postId, json) => {
     const q = [
         'INSERT INTO ig_post (profile_id, post_id, payload)',
-        'VALUES (:profileId, :postId, :value)'
+        'VALUES (:profileId, :postId, :payload)'
     ].join(' ')
 
     await query(q, {
         replacements: {
             profileId,
             postId,
-            value: JSON.stringify(json),
+            payload: JSON.stringify(json),
         },
     })
 }
@@ -64,13 +64,13 @@ const putPost = async (profileId, postId, json) => {
 const putProfile = async (profileId, json) => {
     const q = [
         'INSERT INTO ig_profile (profile_id, payload)',
-        'VALUES (:profileId, :value)'
+        'VALUES (:profileId, :payload)'
     ].join(' ')
 
     await query(q, {
         replacements: {
             profileId,
-            value: JSON.stringify(json),
+            payload: JSON.stringify(json),
         },
     })
 }

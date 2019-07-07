@@ -13,6 +13,6 @@
 module.exports = (data) => ([
     data.id,
     data.name,
-    data.currentPage,
+    data.nextPage,
     data.citiesList.map(item => item.cityId),
 ])

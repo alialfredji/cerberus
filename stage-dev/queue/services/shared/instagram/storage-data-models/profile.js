@@ -12,12 +12,11 @@
         picUrl,
         picUrlHd,
 
-        // metrics
         postsCount,
         followers,
         followings,
         
-        postsList, // only post codes
+        postsList,
         [ isBusinessAccount, businessCategory, businessEmail, businessPhone, businessAddress ],
     ]
 */

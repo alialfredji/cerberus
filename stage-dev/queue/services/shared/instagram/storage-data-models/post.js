@@ -12,15 +12,13 @@
         displayUrl,
         videoUrl,
 
-        // metrics
         likesCount,
         commentsCount,
         videoViews,
 
-        // lists
         sponsorsList,
         taggedList,
-        commentsList // only commenters ids
+        CommentersList,
         [ locationName, locationSlug, locationAddress ],
     ]
 */

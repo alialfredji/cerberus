@@ -25,7 +25,7 @@ And create a data model like:
 
 */
 
-const getErrorOrigin = require('../get-error-origin')
+const getErrorOrigin = require('./lib/get-error-origin')
 
 class CityDataModelError extends Error {
     constructor (message) {
