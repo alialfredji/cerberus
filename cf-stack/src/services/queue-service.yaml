@@ -126,10 +126,8 @@ Resources:
                         apt install awscli -y
                         echo "PG_PASSWORD=${PGPassword}" >> /home/ubuntu/.env.override
                         echo "PG_HOST=${PostgresDNS}" >> /home/ubuntu/.env.override
-                        echo "AWS_SECRET_ACCESS_KEY=${BackupAccessSecret}" >> /home/ubuntu/.env.override
-                        echo "AWS_ACCESS_KEY=${BackupAccessKey}" >> /home/ubuntu/.env.override
-                        echo "AWS_BUCKET=${BackupS3Bucket}" >> /home/ubuntu/.env.override
-                        echo "AWS_REGION=${AWS::Region}" >> /home/ubuntu/.env.override
+                        echo "STORAGE_PG_PASSWORD=${StoragePGPassword}" >> /home/ubuntu/.env.override
+                        echo "STORAGE_PG_HOST=${StoragePostgresDNS}" >> /home/ubuntu/.env.override
                         echo "EC2_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id)" >> /home/ubuntu/.env.override
                         echo "wrote .env.override" >> /home/ubuntu/init.txt 
                         # Pull codebase script

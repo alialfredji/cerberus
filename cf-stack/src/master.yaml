@@ -47,6 +47,11 @@ Parameters:
         Type: String
         NoEcho: true
 
+    StorageDbPassword:
+        Description: password for scraper storage postgres database
+        Type: String
+        NoEcho: true
+
 Mappings:
 
     EnvironmentMap:
@@ -55,6 +60,11 @@ Mappings:
             QueuePgSnapshotId: false
             QueuePgInstanceType: t3.nano
             QueuePgBackupSchedule: "@yearly"
+
+            StoragePgEbsSize: 3
+            StoragePgSnapshotId: false
+            StoragePgInstanceType: t3.nano
+            StoragePgBackupSchedule: "@yearly"
 
             DiscoverySize:              0
             DiscoveryScale:             1
@@ -173,6 +183,30 @@ Resources:
                 BackupSchedule:     !FindInMap [ EnvironmentMap, !Ref EnvironmentType, QueuePgBackupSchedule ]
                 PGPassword:         !Ref QueueDbPassword           
 
+    StoragePG:
+        Type: AWS::CloudFormation::Stack
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/services/storage-pg.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                SubnetId:           !Ref NetworkSubnetId
+                SecurityGroup:      !GetAtt SecurityGroups.Outputs.GenericPostgres
+                EC2KeyPairName:     !Ref EC2KeyPairName
+                InstanceType:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, StoragePgInstanceType ]
+                EBSVolume:          !GetAtt EBSVolumes.Outputs.StoragePgVolume
+                
+                # download codebase
+                S3ReadOnlyRole:     !GetAtt IAMRoles.Outputs.S3ReadOnly
+                S3Bucket:           !GetAtt S3Buckets.Outputs.CodeArtifacts
+                CodeArtifact:       !Sub storage-pg
+                # container props
+                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
+                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
+                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+                BackupS3Prefix:     !Sub storage-pg-${EnvironmentType}
+                BackupSchedule:     !FindInMap [ EnvironmentMap, !Ref EnvironmentType, StoragePgBackupSchedule ]
+                PGPassword:         !Ref StorageDbPassword           
+
     ServiceDiscovery:
         Type: AWS::CloudFormation::Stack
         Condition: IsUpdateRun
@@ -198,10 +232,9 @@ Resources:
                 ServiceName:        discovery
                 ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, DiscoveryScale ]
                 PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                StoragePostgresDNS: !GetAtt StoragePG.Outputs.PublicIp
                 PGPassword:         !Ref QueueDbPassword
-                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
-                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
-                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+                StoragePGPassword:  !Ref StorageDbPassword
 
     ServiceFirstBlood:
         Type: AWS::CloudFormation::Stack
@@ -228,10 +261,9 @@ Resources:
                 ServiceName:        first-blood
                 ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, FirstBloodScale ]
                 PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                StoragePostgresDNS: !GetAtt StoragePG.Outputs.PublicIp
                 PGPassword:         !Ref QueueDbPassword
-                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
-                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
-                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+                StoragePGPassword:  !Ref StorageDbPassword
 
     ServiceProfileTracker:
         Type: AWS::CloudFormation::Stack
@@ -258,10 +290,9 @@ Resources:
                 ServiceName:        profile-tracker
                 ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, ProfileTrackerScale ]
                 PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                StoragePostgresDNS: !GetAtt StoragePG.Outputs.PublicIp
                 PGPassword:         !Ref QueueDbPassword
-                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
-                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
-                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+                StoragePGPassword:  !Ref StorageDbPassword
 
     ServicePostTracker:
         Type: AWS::CloudFormation::Stack
@@ -288,8 +319,7 @@ Resources:
                 ServiceName:        post-tracker
                 ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, PostTrackerScale ]
                 PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                StoragePostgresDNS: !GetAtt StoragePG.Outputs.PublicIp
                 PGPassword:         !Ref QueueDbPassword
-                BackupAccessKey:    !GetAtt IAMRoles.Outputs.GenericAccessKey
-                BackupAccessSecret: !GetAtt IAMRoles.Outputs.GenericAccessSecret
-                BackupS3Bucket:     !GetAtt S3Buckets.Outputs.Backups
+                StoragePGPassword:  !Ref StorageDbPassword
 

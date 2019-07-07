@@ -17,6 +17,7 @@ STACK_NETWORK_VPC="UsePreviousValue=true"
 STACK_NETWORK_SUBNET="UsePreviousValue=true"
 
 QUEUE_DB_PASSWORD="UsePreviousValue=true"
+STORAGE_DB_PASSWORD="UsePreviousValue=true"
 
 function help() {
     echo "SHOW HELP..."
@@ -56,8 +57,12 @@ while [ "$#" -ne 0 ] ; do
             STACK_NETWORK_SUBNET="ParameterValue=${STACK_VPC_SUBNET}"
             shift
             ;;
-        --pg-pwd)
+        --queue-pg-pwd)
             QUEUE_DB_PASSWORD="ParameterValue=${QUEUE_DATABASE_PASSWORD}"
+            shift
+            ;;
+        --storage-pg-pwd)
+            STORAGE_DB_PASSWORD="ParameterValue=${STORAGE_DATABASE_PASSWORD}"
             shift
             ;;
         --no-sync)
@@ -85,6 +90,7 @@ STACK_PARAMS="${STACK_PARAMS} ParameterKey=EC2KeyPairName,${STACK_EC2_KEY_PAIR_N
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=NetworkVPCId,${STACK_NETWORK_VPC}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=NetworkSubnetId,${STACK_NETWORK_SUBNET}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=QueueDbPassword,${QUEUE_DB_PASSWORD}"
+STACK_PARAMS="${STACK_PARAMS} ParameterKey=StorageDbPassword,${QUEUE_DB_PASSWORD}"
 
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=EnvironmentMode,${STACK_ENV_MODE}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=EnvironmentType,UsePreviousValue=true"

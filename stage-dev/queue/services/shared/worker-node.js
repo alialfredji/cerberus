@@ -41,15 +41,15 @@ const start = async (config) => {
                     },
                 ]
 
-                settings.s3Store = {
-                    config: {
-                        accessKeyId: getConfig('AWS_ACCESS_KEY'),
-                        secretAccessKey: getConfig('AWS_SECRET_ACCESS_KEY'),
-                        region: getConfig('AWS_REGION'),
-                        bucket: getConfig('AWS_BUCKET'),
-                    },
-                    isEnabled: getConfig('AWS_ENABLE_BACKUP'),
-                }
+                // settings.s3Store = {
+                //     config: {
+                //         accessKeyId: getConfig('AWS_ACCESS_KEY'),
+                //         secretAccessKey: getConfig('AWS_SECRET_ACCESS_KEY'),
+                //         region: getConfig('AWS_REGION'),
+                //         bucket: getConfig('AWS_BUCKET'),
+                //     },
+                //     isEnabled: getConfig('AWS_ENABLE_BACKUP'),
+                // }
             }
         })
 
@@ -74,7 +74,7 @@ const start = async (config) => {
                 pg,
                 require('./fetchq'),
                 require('./dates'),
-                require('./aws'),
+                // require('./aws'),
                 require('./storage-pg'),
             ],
         })
