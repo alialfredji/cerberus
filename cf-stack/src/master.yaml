@@ -66,11 +66,11 @@ Mappings:
             StoragePgInstanceType: t3.nano
             StoragePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              1
+            DiscoverySize:              0
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             1
+            FirstBloodSize:             0
             FirstBloodScale:            1
             FirstBloodMachine:          t3a.nano
 

@@ -38,6 +38,7 @@ const start = async (config) => {
                         maxAttempts: Number(getConfig('STORAGE_PG_MAX_CONN_ATTEMPTS', 25)),
                         attemptDelay: Number(getConfig('STORAGE_PG_CONN_ATTEMPTS_DELAY', 5000)),
                         models: [],
+                        logging: () => {},
                     },
                 ]
 
