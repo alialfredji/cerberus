@@ -66,11 +66,11 @@ Mappings:
             StoragePgInstanceType: t3.nano
             StoragePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              0
+            DiscoverySize:              1
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             0
+            FirstBloodSize:             1
             FirstBloodScale:            1
             FirstBloodMachine:          t3a.nano
 
@@ -152,6 +152,9 @@ Resources:
                 StackName:          !Ref AWS::StackName
                 QueuePgEbsSize:     !FindInMap [ EnvironmentMap, !Ref EnvironmentType, QueuePgEbsSize ]
                 QueuePgSnapshotId:  !FindInMap [ EnvironmentMap, !Ref EnvironmentType, QueuePgSnapshotId ]
+                StoragePgEbsSize:     !FindInMap [ EnvironmentMap, !Ref EnvironmentType, StoragePgEbsSize ]
+                StoragePgSnapshotId:  !FindInMap [ EnvironmentMap, !Ref EnvironmentType, StoragePgSnapshotId ]
+                
 
 #
 #

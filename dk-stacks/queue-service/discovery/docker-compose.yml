@@ -19,7 +19,7 @@ services:
             PG_CONN_ATTEMPTS_DELAY: ${PG_CONN_ATTEMPTS_DELAY-10}
             PG_DEBUG: ${PG_DEBUG-off}
             STORAGE_PG_HOST: ${STORAGE_PG_HOST-postgres}
-            STORAGE_PG_PORT: ${STORAGE_PG_PORT-1234}
+            STORAGE_PG_PORT: ${STORAGE_PG_PORT-5432}
             STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
             STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
             STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}

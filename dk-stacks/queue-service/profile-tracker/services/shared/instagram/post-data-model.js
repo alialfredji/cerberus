@@ -1,4 +1,4 @@
-const getErrorOrigin = require('../get-error-origin')
+const getErrorOrigin = require('./lib/get-error-origin')
 const getTextUsernames = require('./lib/get-text-usernames')
 const getProfileIdFromSponsor = require('./lib/get-profile-id-from-sponsor')
 const getHashtags = require('./lib/get-hashtags')
@@ -118,7 +118,8 @@ const dataModelLocationAddress = (location) => {
 // data model
 const postDataModel = (json) => {
     const data = json.graphql.shortcode_media
-    const commentsJson = data.edge_media_to_comment || data.edge_media_preview_comment
+    const commentsJson = data.edge_media_to_comment || data.edge_media_preview_comment || data.edge_media_to_parent_comment
+    const commentsSecondJson = data.edge_media_to_parent_comment
     const caption = dataModelCaption(data)
     const sponsorsList = dataModelSponsorsList(data)
 
@@ -141,7 +142,8 @@ const postDataModel = (json) => {
             mentionsList: dataModelMentionsList(caption, sponsorsList),
             sponsorsList,
             taggedList: dataModelTaggedList(data, sponsorsList),
-            commentsList: dataModelCommentsList(commentsJson),
+            commentsList: commentsJson ? dataModelCommentsList(commentsJson) : [],
+            commentsSecondList: commentsSecondJson ? dataModelCommentsList(commentsSecondJson) : [],
             likesList: dataModelLikesList(data),
             hashtagsList: getHashtags(caption),
             ownerFullName: data.owner.full_name,

@@ -4,7 +4,9 @@ const cheerio = require('cheerio')
 
 const { delay } = require('../../shared/dates')
 const dataModel = require('../../shared/instagram/profile-data-model')
-const { storeJSON, storeProfileIds } = require('../../shared/aws')
+const storageDataModel = require('../../shared/instagram/storage-data-models/profile')
+const storagePg = require('../../shared/storage-pg')
+// const { storeJSON, storeProfileIds } = require('../../shared/aws')
 
 const extractInstagramDataFromHtml = require('./lib/extract-ig-data-from-html')
 const profileNextIterationRules = require('./lib/profile-nextIteration-rules')
@@ -119,33 +121,33 @@ const handler = async (doc, { ctx, }) => {
         return { action: 'drop' }
     }
 
-    // store response json data
-    try {
-        await Promise.all([
-            storeJSON({
-                id: json.graphql.user.id + '/' + doc.subject,
-                vendor: 'instagram',
-                type: 'profile',
-                json: json,
-            }),
-            storeProfileIds({
-                id: json.graphql.user.id,
-                vendor: 'instagram',
-                type: 'profile-ids',
-                json: {
-                    id: json.graphql.user.id,
-                    uname: json.graphql.user.username,
-                    followers: json.graphql.user.edge_followed_by
-                        ? json.graphql.user.edge_followed_by.count
-                        : null,
-                    date: new Date(),
-                },
-            })
-        ])
-    } catch (err) {
-        ctx.logger.error(`[${workerName}] storeJSON(profile): ${err.message}`)
-        throw new Error(`storeJSON(profile): ${err.message}`)
-    }
+    // // store response json data
+    // try {
+    //     await Promise.all([
+    //         storeJSON({
+    //             id: json.graphql.user.id + '/' + doc.subject,
+    //             vendor: 'instagram',
+    //             type: 'profile',
+    //             json: json,
+    //         }),
+    //         storeProfileIds({
+    //             id: json.graphql.user.id,
+    //             vendor: 'instagram',
+    //             type: 'profile-ids',
+    //             json: {
+    //                 id: json.graphql.user.id,
+    //                 uname: json.graphql.user.username,
+    //                 followers: json.graphql.user.edge_followed_by
+    //                     ? json.graphql.user.edge_followed_by.count
+    //                     : null,
+    //                 date: new Date(),
+    //             },
+    //         })
+    //     ])
+    // } catch (err) {
+    //     ctx.logger.error(`[${workerName}] storeJSON(profile): ${err.message}`)
+    //     throw new Error(`storeJSON(profile): ${err.message}`)
+    // }
 
     // // ************
     // // END OF MAIN GOAL
@@ -158,6 +160,15 @@ const handler = async (doc, { ctx, }) => {
     } catch (err) {
         ctx.logger.error(`[${workerName}] - data model: ${err.message}`)
         throw new Error(`data model: ${err.message}, url: ${url}`)
+    }
+
+    // storing meaningful data
+    try {
+        const storageData = storageDataModel(data)
+        await storagePg.putProfile(data.id, storageData)
+    } catch (err) {
+        ctx.logger.error(`[${workerName}] - storing meaningful data: ${err.message}`)
+        throw new Error(`storing meaningful data: ${err.message}, url: ${url}`)
     }
 
     // if profile turns private

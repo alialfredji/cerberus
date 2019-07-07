@@ -41,16 +41,12 @@ Parameters:
         Type: String
 
     PGPassword:
-        Description: Postgres password
-        Type: String
-    
-    BackupAccessKey:
         Type: String
 
-    BackupAccessSecret:
+    StoragePostgresDNS:
         Type: String
 
-    BackupS3Bucket:
+    StoragePGPassword:
         Type: String
 
     DesiredCapacity:

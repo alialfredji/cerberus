@@ -3,7 +3,9 @@ const request = require('superagent')
 
 const { delay } = require('../../shared/dates')
 const dataModel = require('../../shared/instagram/country-data-model')
-const { storeJSON } = require('../../shared/aws')
+const storageDataModel = require('../../shared/instagram/storage-data-models/country')
+const storagePg = require('../../shared/storage-pg')
+// const { storeJSON } = require('../../shared/aws')
 
 const countryPriority = require('./lib/country-priority')
 
@@ -57,18 +59,18 @@ const handler = async (doc, { ctx, }) => {
         throw new Error(`http failed: ${err.message}, url: ${url}, status: ${err.status}`)
     }
 
-    // store response json data
-    try {
-        await storeJSON({
-            id: doc.subject + '/' + 'p' + doc.payload.p,
-            vendor: 'instagram',
-            type: 'country',
-            json: res.body,
-        })
-    } catch (err) {
-        ctx.logger.error(`[${workerName}] storeJSON(country): ${err.message}`)
-        throw new Error(`storeJSON(country): ${err.message}`)
-    }
+    // // store response json data
+    // try {
+    //     await storeJSON({
+    //         id: doc.subject + '/' + 'p' + doc.payload.p,
+    //         vendor: 'instagram',
+    //         type: 'country',
+    //         json: res.body,
+    //     })
+    // } catch (err) {
+    //     ctx.logger.error(`[${workerName}] storeJSON(country): ${err.message}`)
+    //     throw new Error(`storeJSON(country): ${err.message}`)
+    // }
 
     // ************
     // END OF MAIN GOAL
@@ -81,6 +83,15 @@ const handler = async (doc, { ctx, }) => {
     } catch (err) {
         ctx.logger.error(`[${workerName}] - data model: ${err.message}`)
         throw new Error(`data model: ${err.message}, url: ${url}`)
+    }
+
+    // storing meaningful data
+    try {
+        const storageData = storageDataModel(data)
+        await storagePg.putCountry(data.id, storageData)
+    } catch (err) {
+        ctx.logger.error(`[${workerName}] - storing meaningful data: ${err.message}`)
+        throw new Error(`storing meaningful data: ${err.message}, url: ${url}`)
     }
 
     // push city id to city queue
