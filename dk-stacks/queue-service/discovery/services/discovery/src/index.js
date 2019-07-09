@@ -23,6 +23,8 @@ require('../../shared/worker-node').start({
         'country': {},
         'location': {},
         'post': {},
+        'post_tracker': {},
+        'first_blood': {},
     },
     workers: [
         require('./directory'),
@@ -30,5 +32,7 @@ require('../../shared/worker-node').start({
         require('./city'),
         require('./location'),
         require('./post'),
+        require('./post-tracker'),
+        require('./profile'),
     ],
 })

@@ -104,7 +104,7 @@ Mappings:
             ProfileTrackerScale:        1
             ProfileTrackerMachine:      t2.nano
 
-            PostTrackerSize:            2
+            PostTrackerSize:            0
             PostTrackerScale:           4
             PostTrackerMachine:         t3a.micro
 
