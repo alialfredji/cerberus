@@ -20,12 +20,8 @@ require('../../shared/worker-node').start({
     queues: {
         'profile_tracker': {},
         'lost_profile': {},
-        'post_tracker': {},
-        'location': {},
     },
     workers: [
         require('./profile'),
-        require('./post-tracker'),
-        require('./location'),
     ],
 })

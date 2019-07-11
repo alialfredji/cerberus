@@ -10,7 +10,7 @@ services:
     postgres:
         image: postgres:11.4
         ports:
-            - ${PG_PORT:-1234}:5432
+            - ${PG_PORT:-5432}:5432
         networks:
             - database
         environment:

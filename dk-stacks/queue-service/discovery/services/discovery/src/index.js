@@ -32,7 +32,8 @@ require('../../shared/worker-node').start({
         require('./city'),
         require('./location'),
         require('./post'),
+        require('./post'),
         require('./post-tracker'),
-        require('./profile'),
+        require('./post-tracker'),
     ],
 })

@@ -19,8 +19,13 @@ require('../../shared/worker-node').start({
     },
     queues: {
         'post_tracker': {},
+        'location': {},
     },
     workers: [
         require('./post'),
+        require('./post'),
+        require('./post'),
+        require('./post'),
+        require('./location'),
     ],
 })

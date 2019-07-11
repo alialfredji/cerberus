@@ -92,21 +92,21 @@ Mappings:
             StoragePgInstanceType: t3.micro
             StoragePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              0
+            DiscoverySize:              2
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             0
+            FirstBloodSize:             3
             FirstBloodScale:            1
             FirstBloodMachine:          t3a.nano
 
-            ProfileTrackerSize:         0
+            ProfileTrackerSize:         2
             ProfileTrackerScale:        1
-            ProfileTrackerMachine:      t2.nano
+            ProfileTrackerMachine:      t3a.nano
 
-            PostTrackerSize:            0
-            PostTrackerScale:           4
-            PostTrackerMachine:         t3a.micro
+            PostTrackerSize:            2
+            PostTrackerScale:           1
+            PostTrackerMachine:         t3.nano
 
 Conditions:
     IsBootRun: !Or
