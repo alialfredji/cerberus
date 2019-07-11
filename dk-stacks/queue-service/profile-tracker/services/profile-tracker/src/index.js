@@ -18,10 +18,18 @@ require('../../shared/worker-node').start({
         pg,
     },
     queues: {
+        'first_blood': {},
         'profile_tracker': {},
         'lost_profile': {},
+        'post_tracker': {},
     },
     workers: [
         require('./profile'),
+        require('./post-tracker'),
+        require('./post-tracker'),
+        require('./post-tracker'),
+        require('./post-tracker'),
+        require('./post-tracker'),
+        require('./post-tracker'),
     ],
 })

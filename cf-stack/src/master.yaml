@@ -92,7 +92,7 @@ Mappings:
             StoragePgInstanceType: t3.micro
             StoragePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              2
+            DiscoverySize:              1
             DiscoveryScale:             1
             DiscoveryMachine:           t3.nano
 
@@ -104,7 +104,7 @@ Mappings:
             ProfileTrackerScale:        1
             ProfileTrackerMachine:      t3a.nano
 
-            PostTrackerSize:            2
+            PostTrackerSize:            1
             PostTrackerScale:           1
             PostTrackerMachine:         t3.nano
 

@@ -69,6 +69,10 @@ const handler = async (doc, { ctx, }) => {
                 return { action: 'drop' }
             case 429:
                 ctx.logger.error(`[${workerName}] too many requests`)
+
+                // pause working on profile to reduce 429
+                await new Promise((resolve, reject) => setTimeout(resolve, 10000))
+
                 return {
                     action: 'reschedule',
                     nextIteration: delay(2, 'hours'),
