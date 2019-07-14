@@ -96,7 +96,7 @@ Mappings:
             DiscoveryScale:             1
             DiscoveryMachine:           t2.nano
 
-            FirstBloodSize:             5
+            FirstBloodSize:             4
             FirstBloodScale:            1
             FirstBloodMachine:          t3.nano
 
