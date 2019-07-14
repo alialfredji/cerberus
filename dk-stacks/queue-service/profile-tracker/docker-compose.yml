@@ -18,11 +18,14 @@ services:
             PG_MAX_CONN_ATTEMPTS: ${PG_MAX_CONN_ATTEMPTS-10}
             PG_CONN_ATTEMPTS_DELAY: ${PG_CONN_ATTEMPTS_DELAY-10}
             PG_DEBUG: ${PG_DEBUG-off}
-            AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY-xxx}
-            AWS_ACCESS_KEY: ${AWS_ACCESS_KEY-xxx}
-            AWS_REGION: ${AWS_REGION-xxx}
-            AWS_BUCKET: ${AWS_BUCKET-xxx}
-            AWS_ENABLE_BACKUP: ${AWS_ENABLE_BACKUP-yes}
+            STORAGE_PG_HOST: ${STORAGE_PG_HOST-postgres}
+            STORAGE_PG_PORT: ${STORAGE_PG_PORT-5432}
+            STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
+            STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
+            STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}
+            STORAGE_PG_MAX_CONN_ATTEMPTS: ${STORAGE_PG_MAX_CONN_ATTEMPTS-10}
+            STORAGE_PG_CONN_ATTEMPTS_DELAY: ${STORAGE_PG_CONN_ATTEMPTS_DELAY-10}
+            STORAGE_PG_DEBUG: ${STORAGE_PG_DEBUG-off}
         working_dir: /usr/src/app/profile-tracker
         entrypoint: ["yarn", "start:prod"]
 

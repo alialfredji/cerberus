@@ -1,0 +1,30 @@
+version: '3.4'
+services:
+
+#
+# Infrastructure
+# - humble boot services
+# - humble drop services
+#
+
+    postgres:
+        image: postgres:11.4
+        ports:
+            - ${PG_PORT:-5432}:5432
+        networks:
+            - database
+        environment:
+            POSTGRES_USER: ${PG_USERNAME:-cerberus}
+            POSTGRES_PASSWORD: ${PG_PASSWORD:-cerberus}
+            POSTGRES_DB: ${PG_DATABASE:-cerberus}
+        volumes:
+            - ${HUMBLE_DATA}/pg:/var/lib/postgresql/data
+            - ${HUMBLE_BACKUP}:/backup
+        restart: always
+
+#
+# Networks definition
+#
+
+networks:
+    database:

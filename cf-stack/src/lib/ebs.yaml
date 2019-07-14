@@ -13,8 +13,17 @@ Parameters:
         Description: (optional) snapshot from where to restore a disk
         Type: String
 
+    StoragePgEbsSize:
+        Description: Size of the postgres database
+        Type: Number
+
+    StoragePgSnapshotId:
+        Description: (optional) snapshot from where to restore a disk
+        Type: String
+
 Conditions:
-    IsQueuePgNewDisk: !Equals [ !Ref QueuePgSnapshotId, false ]
+    IsQueuePgNewDisk:   !Equals [ !Ref QueuePgSnapshotId, false ]
+    IsStoragePgNewDisk: !Equals [ !Ref StoragePgSnapshotId, false ]
 
 Resources:
 
@@ -32,8 +41,26 @@ Resources:
             Tags:
                 - Key: Name
                   Value: !Sub "${StackName}-queue-pg"
+    
+    StoragePgVolume:
+        Type: AWS::EC2::Volume
+        Properties:
+            VolumeType: gp2
+            Size: !Ref StoragePgEbsSize
+            SnapshotId: 
+                Fn::If:
+                - IsStoragePgNewDisk
+                - Ref: AWS::NoValue
+                - Ref: StoragePgSnapshotId
+            AvailabilityZone: !Select [ 0, !GetAZs ]
+            Tags:
+                - Key: Name
+                  Value: !Sub "${StackName}-storage-pg"
 
 Outputs:
 
     QueuePgVolume:
         Value: !Ref QueuePgVolume
+
+    StoragePgVolume:
+        Value: !Ref StoragePgVolume

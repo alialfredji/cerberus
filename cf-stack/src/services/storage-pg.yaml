@@ -1,0 +1,130 @@
+Description: cerberus - queue postgres db
+
+Parameters:
+
+    StackName:
+        Type: String
+
+    SubnetId:
+        Type: String
+
+    SecurityGroup:
+        Type: String
+        Description: Security group to apply to the instances
+
+    EC2KeyPairName:
+        Description: The SSH KeyPair Name to allow access
+        Type: AWS::EC2::KeyPair::KeyName
+
+    InstanceType:
+        Description: Which kind of EC2 machine to use
+        Type: String
+
+    EBSVolume:
+        Description: Data volume to use, if "false" no volume will be attached
+        Type: String
+        Default: false
+
+    PGPassword:
+        Description: Postgres password
+        Type: String
+
+    CodeArtifact:
+        Description: path to code artifact in S3 bucket
+        Type: String
+
+    S3Bucket:
+        Description: Bucket from where to feth code
+        Type: String
+
+    S3ReadOnlyRole:
+        Type: String
+        Description: Should allow full read access to S3 artifacts bucket
+
+    BackupAccessKey:
+        Type: String
+
+    BackupAccessSecret:
+        Type: String
+
+    BackupS3Bucket:
+        Type: String
+
+    BackupS3Prefix:
+        Type: String
+
+    BackupSchedule:
+        Type: String
+
+Resources:
+
+    InstanceProfile:
+        Type: "AWS::IAM::InstanceProfile"
+        Properties:
+            Roles:
+                - !Ref S3ReadOnlyRole
+
+    NetworkInterface:
+        Type: AWS::EC2::NetworkInterface
+        Properties:
+            SubnetId: !Ref SubnetId
+            GroupSet:
+                - !Ref SecurityGroup
+            SourceDestCheck: true
+
+    EC2Instance:
+        Type: AWS::EC2::Instance
+        Properties:
+            ImageId: ami-785db401
+            InstanceType: !Ref InstanceType
+            KeyName: !Ref EC2KeyPairName
+            IamInstanceProfile: !Ref InstanceProfile
+            NetworkInterfaces:
+                - NetworkInterfaceId: !Ref NetworkInterface
+                  DeviceIndex: 0
+            Volumes:
+                - VolumeId: !Ref EBSVolume
+                  Device: "/dev/sdf"
+            UserData:
+                Fn::Base64:
+                    Fn::Sub: |
+                        #!/bin/bash
+                        apt-get update -y
+                        # Install Docker
+                        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+                        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+                        apt-get update -y
+                        apt-cache policy docker-ce
+                        apt-get install -y docker-ce
+                        usermod -aG docker ubuntu
+                        # Docker Compose
+                        curl -o /usr/local/bin/docker-compose -L "https://github.com/docker/compose/releases/download/1.20.1/docker-compose-$(uname -s)-$(uname -m)"
+                        chmod +x /usr/local/bin/docker-compose
+                        # Humble CLI (need to fix the -y compatibility)
+                        git clone https://github.com/marcopeg/humble-cli.git /home/ubuntu/.humble-cli
+                        ln -s /home/ubuntu/.humble-cli/bin/humble.sh /usr/local/bin/humble
+                        # install Make
+                        sudo apt install make
+                        # Download Codebase
+                        apt install awscli -y
+                        echo "rm -rf ./scripts && aws --region ${AWS::Region} s3 cp --recursive s3://${S3Bucket}/${CodeArtifact} /home/ubuntu" >> /home/ubuntu/s3-pull.sh
+                        chmod +x /home/ubuntu/s3-pull.sh
+                        # Prepare local environment
+                        echo "PG_PASSWORD=${PGPassword}" >> /home/ubuntu/.env.local
+                        echo "S3_REGION=${AWS::Region}" >> /home/ubuntu/.env.local
+                        echo "S3_ACCESS_KEY=${BackupAccessKey}" >> /home/ubuntu/.env.local
+                        echo "S3_ACCESS_SECRET=${BackupAccessSecret}" >> /home/ubuntu/.env.local
+                        echo "S3_BUCKET=${BackupS3Bucket}" >> /home/ubuntu/.env.local
+                        echo "S3_PREFIX=${BackupS3Prefix}" >> /home/ubuntu/.env.local
+                        echo "BACKUP_SCHEDULE=${BackupSchedule}" >> /home/ubuntu/.env.local                        
+            Tags:
+                - Key: Name
+                  Value: !Sub "${StackName}-${CodeArtifact}"
+
+Outputs:
+
+    PublicIp:
+        Value: !GetAtt EC2Instance.PublicIp
+
+    PrivateIp:
+        Value: !GetAtt EC2Instance.PrivateIp

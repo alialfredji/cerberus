@@ -56,6 +56,7 @@ BUCKET_URL="https://s3-${AWS_REGION}.amazonaws.com/${STACK_BUCKET}/${STACK_NAME}
 # Provided from enviroment variables
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=EC2KeyPairName,ParameterValue=${EC2_KEY_PAIR_NAME}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=QueueDbPassword,ParameterValue=${QUEUE_DATABASE_PASSWORD}"
+STACK_PARAMS="${STACK_PARAMS} ParameterKey=StorageDbPassword,ParameterValue=${STORAGE_DATABASE_PASSWORD}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=NetworkVPCId,ParameterValue=${STACK_VPC}"
 STACK_PARAMS="${STACK_PARAMS} ParameterKey=NetworkSubnetId,ParameterValue=${STACK_VPC_SUBNET}"
 

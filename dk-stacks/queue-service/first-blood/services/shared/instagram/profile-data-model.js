@@ -3,7 +3,7 @@
 
 */
 
-const getErrorOrigin = require('../get-error-origin')
+const getErrorOrigin = require('./lib/get-error-origin')
 const text2emails = require('./lib/text2emails')
 const getUploadFrequency = require('./lib/get-upload-frequency')
 const getAvgLikes = require('./lib/get-average-likes')

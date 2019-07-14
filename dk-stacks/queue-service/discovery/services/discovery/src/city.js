@@ -3,6 +3,8 @@ const request = require('superagent')
 
 const { delay } = require('../../shared/dates')
 const dataModel = require('../../shared/instagram/city-data-model')
+const storageDataModel = require('../../shared/instagram/storage-data-models/city')
+const storagePg = require('../../shared/storage-pg')
 const { storeJSON } = require('../../shared/aws')
 
 const workerName = 'discovery::city'
@@ -44,18 +46,18 @@ const handler = async (doc, { ctx, }) => {
         throw new Error(`http failed: ${err.message}, url: ${url}, status: ${err.status}`)
     }
 
-    // store response json data
-    try {
-        await storeJSON({
-            id: doc.subject + '/' + 'p' + doc.payload.p,
-            vendor: 'instagram',
-            type: 'city',
-            json: res.body,
-        })
-    } catch (err) {
-        ctx.logger.error(`[${workerName}] storeJSON(city): ${err.message}`)
-        throw new Error(`storeJSON(city): ${err.message}`)
-    }
+    // // store response json data
+    // try {
+    //     await storeJSON({
+    //         id: doc.subject + '/' + 'p' + doc.payload.p,
+    //         vendor: 'instagram',
+    //         type: 'city',
+    //         json: res.body,
+    //     })
+    // } catch (err) {
+    //     ctx.logger.error(`[${workerName}] storeJSON(city): ${err.message}`)
+    //     throw new Error(`storeJSON(city): ${err.message}`)
+    // }
 
     // ************
     // END OF MAIN GOAL
@@ -68,6 +70,15 @@ const handler = async (doc, { ctx, }) => {
     } catch (err) {
         ctx.logger.error(`[${workerName}] - data model: ${err.message}`)
         throw new Error(`data model: ${err.message}, url: ${url}`)
+    }
+
+    // storing meaningful data
+    try {
+        const storageData = storageDataModel(data)
+        await storagePg.putCity(data.id, storageData)
+    } catch (err) {
+        ctx.logger.error(`[${workerName}] - storing meaningful data: ${err.message}`)
+        throw new Error(`storing meaningful data: ${err.message}, url: ${url}`)
     }
 
     // push location id to location queue

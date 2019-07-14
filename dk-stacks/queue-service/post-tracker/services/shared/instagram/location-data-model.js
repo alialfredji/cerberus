@@ -42,7 +42,7 @@ And created a data model like:
 
 */
 
-const getErrorOrigin = require('../get-error-origin')
+const getErrorOrigin = require('./lib/get-error-origin')
 const getAvgPostTimestamp = require('./lib/get-average-post-timestamp')
 const getPostTimestampByDate = require('./lib/get-post-timestamp-by-date')
 

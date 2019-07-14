@@ -3,11 +3,13 @@ const request = require('superagent')
 
 const { delay } = require('../../shared/dates')
 const dataModel = require('../../shared/instagram/post-data-model')
-const { storeJSON } = require('../../shared/aws')
+const storageDataModel = require('../../shared/instagram/storage-data-models/post')
+const storagePg = require('../../shared/storage-pg')
+// const { storeJSON } = require('../../shared/aws')
 
 const postPushToFirstBlood = require('./lib/post-push-to-first-blood')
 
-const workerName = 'discovery::post'
+const workerName = 'post-tracker::post'
 
 /* 
     ---- MAIN GOAL ----
@@ -87,18 +89,18 @@ const handler = async (doc, { ctx, }) => {
         throw new Error(`http failed: ${err.message}, url: ${url}, status: ${err.status}`)
     }
 
-    // store response json data
-    try {
-        await storeJSON({
-            id: res.body.graphql.shortcode_media.owner.id + '/' + doc.subject,
-            vendor: 'instagram',
-            type: 'profile-post',
-            json: res.body,
-        })
-    } catch (err) {
-        ctx.logger.error(`[${workerName}] storeJSON(post): ${err.message}`)
-        throw new Error(`storeJSON(post): ${err.message}`)
-    }
+    // // store response json data
+    // try {
+    //     await storeJSON({
+    //         id: res.body.graphql.shortcode_media.owner.id + '/' + doc.subject,
+    //         vendor: 'instagram',
+    //         type: 'profile-post',
+    //         json: res.body,
+    //     })
+    // } catch (err) {
+    //     ctx.logger.error(`[${workerName}] storeJSON(post): ${err.message}`)
+    //     throw new Error(`storeJSON(post): ${err.message}`)
+    // }
 
     // ************
     // END OF MAIN GOAL
@@ -111,6 +113,15 @@ const handler = async (doc, { ctx, }) => {
     } catch (err) {
         ctx.logger.error(`[${workerName}] - data model: ${err.message}`)
         throw new Error(`data model: ${err.message}, url: ${url}`)
+    }
+
+    // storing meaningful data
+    try {
+        const storageData = storageDataModel(data)
+        await storagePg.putPost(data.ownerId, data.code, storageData)
+    } catch (err) {
+        ctx.logger.error(`[${workerName}] - storing meaningful data: ${err.message}`)
+        throw new Error(`storing meaningful data: ${err.message}, url: ${url}`)
     }
 
     // push usernames to first-blood queue

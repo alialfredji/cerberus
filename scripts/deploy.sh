@@ -62,6 +62,22 @@ function syncQueuePG() {
     echo ">> done!"
 }
 
+function syncStoragePG() {
+    TARGET="storage-pg"
+    BUCKET="s3://${CODE_ARTIFACTS_BUCKET}/${TARGET}"
+    SERVICE_PATH="${PWD}/dk-stacks/${TARGET}"
+
+    echo "Deploy storage postgres database?"
+    enterToContinue
+    echo ">> Release storage postgres database: ${TARGET}"
+
+    # Upload to S3
+    echo "Upload (${TARGET}) files to s3 - ${BUCKET}"
+    aws --profile ${AWS_CLI_PROFILE} s3 rm --recursive ${BUCKET}
+    aws --profile ${AWS_CLI_PROFILE} s3 cp --exclude .env.local --exclude data/* --recursive ${SERVICE_PATH} ${BUCKET}
+    echo ">> done!"
+}
+
 # Compose local properties with flag options
 while [ "$#" -ne 0 ] ; do
     case "$1" in
@@ -75,6 +91,11 @@ while [ "$#" -ne 0 ] ; do
             ;;
         queue-service)
             syncQueueService ${2}
+            exit 0
+            shift
+            ;;
+        storage-pg)
+            syncStoragePG
             exit 0
             shift
             ;;

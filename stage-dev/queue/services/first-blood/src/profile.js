@@ -4,7 +4,9 @@ const cheerio = require('cheerio')
 
 const { delay } = require('../../shared/dates')
 const dataModel = require('../../shared/instagram/profile-data-model')
-const { storeJSON } = require('../../shared/aws')
+const storageDataModel = require('../../shared/instagram/storage-data-models/profile')
+const storagePg = require('../../shared/storage-pg')
+// const { storeJSON } = require('../../shared/aws')
 
 const extractInstagramDataFromHtml = require('./lib/extract-ig-data-from-html')
 const getFirstBloodProfileRules = require('./lib/get-first-blood-profile-rules')
@@ -43,6 +45,10 @@ const handler = async (doc, { ctx, }) => {
                 return { action: 'drop' }
             case 429:
                 ctx.logger.error(`[${workerName}] too many requests`)
+                
+                // pause working on profile to reduce 429
+                await new Promise((resolve, reject) => setTimeout(resolve, 10000))
+
                 return {
                     action: 'reschedule',
                     nextIteration: delay(2, 'hours'),
@@ -78,18 +84,18 @@ const handler = async (doc, { ctx, }) => {
         throw new Error(`[${workerName}] - Instagram profile not found: ${url}`)
     }
 
-    // store response json data
-    try {
-        await storeJSON({
-            id: json.graphql.user.id + '/' + doc.subject,
-            vendor: 'instagram',
-            type: 'first-blood',
-            json: json,
-        })
-    } catch (err) {
-        ctx.logger.error(`[${workerName}] storeJSON(profile): ${err.message}`)
-        throw new Error(`storeJSON(profile): ${err.message}`)
-    }
+    // // store response json data
+    // try {
+    //     await storeJSON({
+    //         id: json.graphql.user.id + '/' + doc.subject,
+    //         vendor: 'instagram',
+    //         type: 'first-blood',
+    //         json: json,
+    //     })
+    // } catch (err) {
+    //     ctx.logger.error(`[${workerName}] storeJSON(profile): ${err.message}`)
+    //     throw new Error(`storeJSON(profile): ${err.message}`)
+    // }
 
     // // ************
     // // END OF MAIN GOAL
@@ -108,20 +114,31 @@ const handler = async (doc, { ctx, }) => {
     const rules = getFirstBloodProfileRules(data)
     const profileNextIteration = profileNextIterationRules(data)
 
-    // store response json in profile list if influencerr
     if (rules.priority !== -1) {
+        // storing meaningful data
         try {
-            await storeJSON({
-                id: json.graphql.user.id + '/' + doc.subject,
-                vendor: 'instagram',
-                type: 'profile',
-                json: json,
-            })
+            const storageData = storageDataModel(data)
+            await storagePg.putProfile(data.id, storageData)
         } catch (err) {
-            ctx.logger.error(`[${workerName}] storeJSON(profile): ${err.message}`)
-            throw new Error(`storeJSON(profile): ${err.message}`)
+            ctx.logger.error(`[${workerName}] - storing meaningful data: ${err.message}`)
+            throw new Error(`storing meaningful data: ${err.message}, url: ${url}`)
         }
     }
+
+    // // store response json in profile list if influencerr
+    // if (rules.priority !== -1) {
+    //     try {
+    //         await storeJSON({
+    //             id: json.graphql.user.id + '/' + doc.subject,
+    //             vendor: 'instagram',
+    //             type: 'profile',
+    //             json: json,
+    //         })
+    //     } catch (err) {
+    //         ctx.logger.error(`[${workerName}] storeJSON(profile): ${err.message}`)
+    //         throw new Error(`storeJSON(profile): ${err.message}`)
+    //     }
+    // }
 
     // push username to profile_tracker queue
     if (rules.priority !== -1) {

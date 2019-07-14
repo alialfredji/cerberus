@@ -3,7 +3,9 @@ const request = require('superagent')
 
 const { delay } = require('../../shared/dates')
 const dataModel = require('../../shared/instagram/location-data-model')
-const { storeJSON } = require('../../shared/aws')
+const storageDataModel = require('../../shared/instagram/storage-data-models/location')
+const storagePg = require('../../shared/storage-pg')
+// const { storeJSON } = require('../../shared/aws')
 
 const workerName = 'discovery::location'
 
@@ -58,18 +60,18 @@ const handler = async (doc, { ctx, }) => {
         throw new Error(`http failed: ${err.message}, url: ${url}, status: ${err.status}`)
     }
 
-    // store response json data
-    try {
-        await storeJSON({
-            id: doc.subject,
-            vendor: 'instagram',
-            type: 'location',
-            json: res.body,
-        })
-    } catch (err) {
-        ctx.logger.error(`[${workerName}] storeJSON(location): ${err.message}`)
-        throw new Error(`storeJSON(location): ${err.message}`)
-    }
+    // // store response json data
+    // try {
+    //     await storeJSON({
+    //         id: doc.subject,
+    //         vendor: 'instagram',
+    //         type: 'location',
+    //         json: res.body,
+    //     })
+    // } catch (err) {
+    //     ctx.logger.error(`[${workerName}] storeJSON(location): ${err.message}`)
+    //     throw new Error(`storeJSON(location): ${err.message}`)
+    // }
 
     // ************
     // END OF MAIN GOAL
@@ -98,6 +100,15 @@ const handler = async (doc, { ctx, }) => {
         }
     }
 
+    // storing meaningful data
+    try {
+        const storageData = storageDataModel(data)
+        await storagePg.putLocation(data.id, storageData)
+    } catch (err) {
+        ctx.logger.error(`[${workerName}] - storing meaningful data: ${err.message}`)
+        throw new Error(`storing meaningful data: ${err.message}, url: ${url}`)
+    }
+
     // push post code to post queue
     try {
         await ctx.doc.pushMany('post', {
@@ -122,6 +133,6 @@ module.exports = {
     queue: 'location',
     version: 0,
     sleep: 1000 * 60,
-    delay: 2000, // to reduce status:429 errors
+    delay: 2500, // to reduce status:429 errors
     handler,
 }
