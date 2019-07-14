@@ -94,19 +94,19 @@ Mappings:
 
             DiscoverySize:              1
             DiscoveryScale:             1
-            DiscoveryMachine:           t3.nano
+            DiscoveryMachine:           t2.nano
 
-            FirstBloodSize:             3
+            FirstBloodSize:             5
             FirstBloodScale:            1
-            FirstBloodMachine:          t3a.nano
+            FirstBloodMachine:          t3.nano
 
-            ProfileTrackerSize:         2
+            ProfileTrackerSize:         3
             ProfileTrackerScale:        1
             ProfileTrackerMachine:      t3a.nano
 
             PostTrackerSize:            1
             PostTrackerScale:           1
-            PostTrackerMachine:         t3.nano
+            PostTrackerMachine:         t2.nano
 
 Conditions:
     IsBootRun: !Or

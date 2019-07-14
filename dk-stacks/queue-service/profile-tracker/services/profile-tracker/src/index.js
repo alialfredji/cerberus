@@ -29,7 +29,5 @@ require('../../shared/worker-node').start({
         require('./post-tracker'),
         require('./post-tracker'),
         require('./post-tracker'),
-        require('./post-tracker'),
-        require('./post-tracker'),
     ],
 })
