@@ -1,3 +1,6 @@
+
+/dk-stacks
+
 # Environment Files
 !.env
 .env.*
@@ -5,10 +8,6 @@
 # Data Folders
 node_modules
 data
-/build/queue-service/discovery/services
-/build/queue-service/first-blood/services
-/build/queue-service/post-tracker/services
-/build/queue-service/profile-tracker/services
 
 # NPM Related Files
 yarn.lock

@@ -27,6 +27,10 @@ require('../../shared/worker-node').start({
         require('./post'),
         require('./post'),
         require('./post'),
+        require('./post'),
+        require('./post'),
+        require('./post'),
+        require('./post'),
         require('./location'),
     ],
 })

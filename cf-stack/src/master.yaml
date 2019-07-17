@@ -96,11 +96,11 @@ Mappings:
             DiscoveryScale:             1
             DiscoveryMachine:           t2.nano
 
-            FirstBloodSize:             4
+            FirstBloodSize:             5
             FirstBloodScale:            1
             FirstBloodMachine:          t3.nano
 
-            ProfileTrackerSize:         3
+            ProfileTrackerSize:         5
             ProfileTrackerScale:        1
             ProfileTrackerMachine:      t3a.nano
 

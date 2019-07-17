@@ -19,13 +19,12 @@ require('../../shared/worker-node').start({
     },
     queues: {
         'first_blood': {},
-        'post_tracker': {},
-        'profile_tracker': {},
+        // 'post_tracker': {},
     },
     workers: [
         require('./profile'),
-        require('./post-tracker'),
-        require('./post-tracker'),
+        // require('./post-tracker'),
+        // require('./post-tracker'),
         // require('./post-tracker'),
         // require('./post-tracker'),
     ],
