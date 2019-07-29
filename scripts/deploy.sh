@@ -33,8 +33,8 @@ function syncQueueService() {
 
     # copy fresh sources
     echo "-- copy (${TARGET}) files"
-    cp -rf "${PWD}/stage-dev/queue/services/shared" "${SERVICE_PATH}/services/shared"
-    cp -rf "${PWD}/stage-dev/queue/services/${TARGET}" "${SERVICE_PATH}/services/${TARGET}"
+    cp -rf "${PWD}/services/queue/services/shared" "${SERVICE_PATH}/services/shared"
+    cp -rf "${PWD}/services/queue/services/${TARGET}" "${SERVICE_PATH}/services/${TARGET}"
 
     # clean node modules
     [ -d "${SERVICE_PATH}/services/${TARGET}/node_modules" ] && rm -rf "${SERVICE_PATH}/services/${TARGET}/node_modules"
