@@ -87,24 +87,24 @@ Mappings:
             QueuePgInstanceType: t3.small
             QueuePgBackupSchedule: "@yearly"
 
-            StoragePgEbsSize: 30
+            StoragePgEbsSize: 100
             StoragePgSnapshotId: false
             StoragePgInstanceType: t3.micro
             StoragePgBackupSchedule: "@yearly"
 
-            DiscoverySize:              1
-            DiscoveryScale:             1
+            DiscoverySize:              1 #1
+            DiscoveryScale:             1 
             DiscoveryMachine:           t3.nano
 
-            FirstBloodSize:             2
+            FirstBloodSize:             2 #2
             FirstBloodScale:            1
-            FirstBloodMachine:          t2.nano
+            FirstBloodMachine:          t3a.nano
 
-            ProfileTrackerSize:         8
+            ProfileTrackerSize:         8 #8
             ProfileTrackerScale:        1
-            ProfileTrackerMachine:      t2.nano
+            ProfileTrackerMachine:      t3a.nano
 
-            PostTrackerSize:            1
+            PostTrackerSize:            1 #1
             PostTrackerScale:           1
             PostTrackerMachine:         t3.nano
 
