@@ -30,7 +30,7 @@ require('../../shared/worker-node').start({
         require('./directory'),
         require('./country'),
         require('./city'),
-        require('./location'),
+        // require('./location'),
         require('./post'),
         require('./post'),
         require('./post-tracker'),
