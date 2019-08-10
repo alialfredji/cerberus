@@ -1,0 +1,56 @@
+{
+  "name": "node-setup",
+  "author": "",
+  "license": "ISC",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "----- // DEFAULT SCRIPTS // -----": "",
+    "start:dev": "yarn install && NODE_ENV=development PRCID=$(cat /etc/hostname) nodemon index.js",
+    "start:prod": "yarn install && NODE_ENV=production PRCID=$(cat /etc/hostname) node index.js",
+    "----- // CLEANING SCRIPTS // -----": "",
+    "clean:npm": "rm -rf ./node_modules",
+    "clean": "rm -rf build",
+    "reset": "npm run clean && npm run clean:npm"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@forrestjs/eslint-config-universal"
+    ]
+  },
+  "eslintIgnore": [
+    "/.docker-volumes/**/*",
+    "/node_modules/**/*",
+    "/build/**/*"
+  ],
+  "babel": {
+    "presets": [
+      "@forrestjs/babel-preset-universal"
+    ]
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.4.4",
+    "@forrestjs/hooks": "^3.0.5",
+    "@forrestjs/service-env": "^3.0.5",
+    "@forrestjs/service-logger": "^3.0.5",
+    "@forrestjs/service-postgres": "^3.0.7",
+    "cheerio": "^1.0.0-rc.3",
+    "es6-promise": "^4.2.8",
+    "fetchq": "^1.3.2",
+    "isomorphic-fetch": "^2.2.1",
+    "superagent": "^5.1.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "@forrestjs/babel-preset-universal": "^3.0.0",
+    "@forrestjs/eslint-config-universal": "^3.0.0",
+    "mocha": "^6.2.0",
+    "nodemon": "^1.19.1"
+  }
+}
