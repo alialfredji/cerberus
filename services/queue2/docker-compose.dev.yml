@@ -31,6 +31,26 @@ services:
             - ${HUMBLE_BACKUP}/storage_pg:/backup
         restart: always
 
+    elasticsearch:
+        image: elasticsearch:7.2.0
+        ports:
+            - ${ELASTICSEARCH_PORT:-9200}:9200
+        networks:
+            - wilder
+        environment:
+            - discovery.type=single-node
+            # - discovery.seed_hosts=es02
+            # - cluster.initial_master_nodes=es01,es02
+            # - cluster.name=docker-cluster
+            # - bootstrap.memory_lock=true
+            # - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        # ulimits:
+        #     memlock:
+        #       soft: -1
+        #       hard: -1
+        volumes:
+            - ${HUMBLE_DATA}/elasticsearch:/usr/share/elasticsearch/data
+
 #
 # REAL WORKER PROCESSES
 #
