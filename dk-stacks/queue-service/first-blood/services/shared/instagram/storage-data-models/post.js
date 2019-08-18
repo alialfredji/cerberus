@@ -39,4 +39,5 @@ module.exports = (data) => ([
     data.taggedList,
     data.commentsSecondList.map(item => item.ownerId),
     [ data.locationName, data.locationSlug, data.locationAddress ],
+    data.timestamp,
 ])
