@@ -44,6 +44,7 @@ export const setPostPayload = (data) => ([
     data.taggedList,
     data.commentsSecondList.map(item => item.ownerId),
     [ data.locationName, data.locationSlug, data.locationAddress ],
+    data.timestamp,
 ])
 
 export const setProfilePayload = (data) => ([
