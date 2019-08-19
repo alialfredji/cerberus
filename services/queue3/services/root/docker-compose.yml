@@ -1,0 +1,23 @@
+version: '3.4'
+services:
+    
+    app:
+        build: .
+        environment:
+            NODE_ENV: production
+            LOG_LEVEL: ${LOG_LEVEL-info}
+            PG_HOST: ${PG_HOST}
+            PG_PORT: ${PG_PORT}
+            PG_PASSWORD: ${PG_PASSWORD}
+            PG_DATABASE: ${PG_DATABASE}
+            PG_USERNAME: ${PG_USERNAME}
+            STORAGE_PG_HOST: ${STORAGE_PG_HOST}
+            STORAGE_PG_PORT: ${STORAGE_PG_PORT}
+            STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME}
+            STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD}
+            STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE}
+            API_ENDPOINT: ${API_ENDPOINT}
+            API_TOKEN: ${API_TOKEN}
+        restart: always
+
+

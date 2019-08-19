@@ -1,0 +1,59 @@
+version: '3.4'
+services:
+
+    queue_pg:
+        image: fetchq/fetchq:10.4-1.3.0
+        ports:
+            - ${PG_PORT:-5432}:5432
+        networks:
+            - wilder
+        environment:
+            POSTGRES_USER: ${PG_USERNAME:-cerberus}
+            POSTGRES_PASSWORD: ${PG_PASSWORD:-cerberus}
+            POSTGRES_DB: ${PG_DATABASE:-cerberus}
+        volumes:
+            - ${HUMBLE_DATA}/queue_pg:/var/lib/postgresql/data
+            - ${HUMBLE_BACKUP}/queue_pg:/backup
+        restart: always
+    
+    storage_pg:
+        image: fetchq/fetchq:10.4-1.3.0
+        ports:
+            - ${STORAGE_PG_PORT:-5433}:5432
+        networks:
+            - wilder
+        environment:
+            POSTGRES_USER: ${STORAGE_PG_USERNAME:-cerberus}
+            POSTGRES_PASSWORD: ${STORAGE_PG_PASSWORD:-cerberus}
+            POSTGRES_DB: ${STORAGE_PG_DATABASE:-cerberus}
+        volumes:
+            - ${HUMBLE_DATA}/storage_pg:/var/lib/postgresql/data
+            - ${HUMBLE_BACKUP}/storage_pg:/backup
+        restart: always
+
+    elasticsearch:
+        image: elasticsearch:7.2.0
+        ports:
+            - ${ELASTICSEARCH_PORT:-9200}:9200
+        networks:
+            - wilder
+        environment:
+            - discovery.type=single-node
+            # - discovery.seed_hosts=es02
+            # - cluster.initial_master_services=es01,es02
+            # - cluster.name=docker-cluster
+            # - bootstrap.memory_lock=true
+            # - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        # ulimits:
+        #     memlock:
+        #       soft: -1
+        #       hard: -1
+        volumes:
+            - ${HUMBLE_DATA}/elasticsearch:/usr/share/elasticsearch/data
+
+#
+# Networks definition
+#
+
+networks:
+    wilder:
