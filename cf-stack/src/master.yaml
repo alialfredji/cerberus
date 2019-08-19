@@ -96,6 +96,10 @@ Mappings:
             DiscoveryScale:             1 
             DiscoveryMachine:           t3.nano
 
+            Discovery3Size:              0 #1
+            Discovery3Scale:             1 
+            Discovery3Machine:           t3.nano
+
             FirstBloodSize:             2 #2
             FirstBloodScale:            1
             FirstBloodMachine:          t3a.nano
@@ -214,6 +218,35 @@ Resources:
                 BackupS3Prefix:     !Sub storage-pg-${EnvironmentType}
                 BackupSchedule:     !FindInMap [ EnvironmentMap, !Ref EnvironmentType, StoragePgBackupSchedule ]
                 PGPassword:         !Ref StorageDbPassword           
+
+    ServiceDiscovery3:
+        Type: AWS::CloudFormation::Stack
+        Condition: IsUpdateRun
+        DependsOn: QueuePG
+        Properties:
+            TemplateURL:            !Sub "${S3TemplateRoot}/services/queue3-service.yaml"
+            Parameters:
+                StackName:          !Ref AWS::StackName
+                SecurityGroup:      !GetAtt SecurityGroups.Outputs.GenericService
+                EC2KeyPairName:     !Ref EC2KeyPairName
+                InstanceType:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, Discovery3Machine ]
+                
+                # download service codebase
+                S3ReadOnlyRole:     !GetAtt IAMRoles.Outputs.S3ReadOnly
+                S3Bucket:           !GetAtt S3Buckets.Outputs.CodeArtifacts
+                CodeArtifact:       !Sub queue3-service
+
+                # autoscaling
+                DesiredCapacity:    !FindInMap [ EnvironmentMap, !Ref EnvironmentType, Discovery3Size ]
+                MaxCapacity:        10
+
+                # service enviroment variables
+                ServiceName:        discovery
+                ServiceScale:       !FindInMap [ EnvironmentMap, !Ref EnvironmentType, Discovery3Scale ]
+                PostgresDNS:        !GetAtt QueuePG.Outputs.PublicIp
+                StoragePostgresDNS: !GetAtt StoragePG.Outputs.PublicIp
+                PGPassword:         !Ref QueueDbPassword
+                StoragePGPassword:  !Ref StorageDbPassword
 
     ServiceDiscovery:
         Type: AWS::CloudFormation::Stack
