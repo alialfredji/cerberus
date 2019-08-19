@@ -51,6 +51,14 @@ services:
         volumes:
             - ${HUMBLE_DATA}/elasticsearch:/usr/share/elasticsearch/data
 
+    grafana:
+        image: grafana/grafana:5.0.4
+        ports:
+            - ${GRAFANA_PORT-5555}:3000
+        environment:
+            GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD-admin}
+        volumes:
+            - ${HUMBLE_DATA}/grafana:/var/lib/grafana
 #
 # Networks definition
 #

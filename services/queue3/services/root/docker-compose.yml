@@ -3,6 +3,8 @@ services:
     
     app:
         build: .
+        networks:
+            - wilder
         environment:
             NODE_ENV: production
             LOG_LEVEL: ${LOG_LEVEL-info}
@@ -19,5 +21,12 @@ services:
             API_ENDPOINT: ${API_ENDPOINT}
             API_TOKEN: ${API_TOKEN}
         restart: always
+
+#
+# Networks definition
+#
+
+networks:
+    frontend:
 
 
