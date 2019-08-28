@@ -1,0 +1,39 @@
+{
+  "name": "cerberus-profile-tracker",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "yarn install && PRCID=$(cat /etc/hostname) nodemon index.js",
+    "start:prod": "yarn install && PRCID=$(cat /etc/hostname) node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  },
+  "nodemonConfig": {
+    "delay": 1000,
+    "watch": [
+      "./index.js",
+      "./src",
+      "../shared"
+    ],
+    "ext": "js json",
+    "restartable": "rs"
+  },
+  "dependencies": {
+    "@forrestjs/hooks": "^2.9.12",
+    "@forrestjs/service-env": "^2.9.12",
+    "@forrestjs/service-postgres": "^2.9.12",
+    "@marcopeg/utils": "^2.0.1",
+    "aws-sdk": "^2.480.0",
+    "cheerio": "^1.0.0-rc.3",
+    "fetchq": "^1.3.2",
+    "franc": "^4.1.0",
+    "moment": "^2.24.0",
+    "superagent": "^5.1.0"
+  }
+}

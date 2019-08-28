@@ -42,6 +42,7 @@ const start = async (config) => {
                     },
                 ]
 
+                
                 // settings.s3Store = {
                 //     config: {
                 //         accessKeyId: getConfig('AWS_ACCESS_KEY'),
