@@ -9,8 +9,8 @@ const handler = async (doc, { ctx }) => {
     // ctx.logger.verbose(`[${workerName}] work on ${doc.subject} - ${url}`)
 
     const queries = await Promise.all([
-        await storagePg.getProfile(doc.subject, { limit: 3 }),
-        await storagePg.getProfilePosts(doc.subject, { limit: 3 }),
+        await storagePg.getProfile(doc.subject, { limit: 60 }),
+        await storagePg.getProfilePosts(doc.subject, { limit: 60 }),
         // getProfileLang(profileId),
     ])
 
@@ -18,6 +18,8 @@ const handler = async (doc, { ctx }) => {
         postData: queries[1][0],
         profileData: queries[0][0],
     })
+
+    console.log(dataModel)
 
     // need detect language api key or can call search-api to find out
     // if error or something bad happened set values as null
