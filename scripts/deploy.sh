@@ -6,34 +6,6 @@ function help() {
     exit 0
 }
 
-function syncQueue3Service() {
-    TARGET=$1
-    BUCKET="s3://${CODE_ARTIFACTS_BUCKET}/queue3-service/${TARGET}"
-    SERVICE_PATH="${PWD}/dk-stacks/queue3-service/${TARGET}"
-
-    # Check the service name
-    if [ $TARGET = false ];
-    then
-        echo "Please specify which service you would like to deploy"
-        exit -1
-    fi
-
-    # skip check when deploying all services
-    if [ ${2-false} != "all" ];
-    then
-        echo "Deploy queue service: ${TARGET}?"
-        echo ""
-        enterToContinue
-        echo ">> Release queue service: ${TARGET}"
-    fi
-    
-    # # upload artifacts
-    echo "Upload (${TARGET}) files to s3 - ${BUCKET}"
-    aws --profile ${AWS_CLI_PROFILE} s3 rm --recursive ${BUCKET}
-    aws --profile ${AWS_CLI_PROFILE} s3 cp --exclude .env.local --recursive ${SERVICE_PATH} ${BUCKET}
-    echo ">> done!"
-}
-
 function syncQueueService() {
     TARGET=$1
     BUCKET="s3://${CODE_ARTIFACTS_BUCKET}/queue-service/${TARGET}"
@@ -122,11 +94,6 @@ while [ "$#" -ne 0 ] ; do
             exit 0
             shift
             ;;
-        queue3-service)
-            syncQueue3Service ${2}
-            exit 0
-            shift
-            ;;
         storage-pg)
             syncStoragePG
             exit 0
@@ -139,17 +106,7 @@ while [ "$#" -ne 0 ] ; do
             syncQueueService first-blood all
             syncQueueService profile-tracker all
             syncQueueService post-tracker all
-            exit 0
-            shift
-            shift
-            ;;
-        --queue3-all)
-            echo "Deploy all the queue services?"
-            enterToContinue
-            syncQueue3Service discovery all
-            syncQueue3Service first-blood all
-            syncQueue3Service profile-tracker all
-            syncQueue3Service post-tracker all
+            syncQueueService profile-builder all
             exit 0
             shift
             shift

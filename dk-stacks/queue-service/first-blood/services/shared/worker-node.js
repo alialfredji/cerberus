@@ -1,7 +1,7 @@
 
 const start = async (config) => {
     const { libs, workers, queues } = config
-    const { hooks, getConfig, env, moment, fetchq, aws, pg } = libs 
+    const { hooks, getConfig, env, moment, fetchq, aws, pg, request } = libs 
     const { registerAction, runHookApp, logBoot, FINISH, SETTINGS, } = hooks
 
     // run hook app
@@ -42,15 +42,10 @@ const start = async (config) => {
                     },
                 ]
 
-                // settings.s3Store = {
-                //     config: {
-                //         accessKeyId: getConfig('AWS_ACCESS_KEY'),
-                //         secretAccessKey: getConfig('AWS_SECRET_ACCESS_KEY'),
-                //         region: getConfig('AWS_REGION'),
-                //         bucket: getConfig('AWS_BUCKET'),
-                //     },
-                //     isEnabled: getConfig('AWS_ENABLE_BACKUP'),
-                // }
+                settings.searchApi = {
+                    token: getConfig('API_TOKEN', ''),
+                    endpoint: getConfig('API_ENDPOINT', 'http://localhost:8080/api'),
+                }
             }
         })
 
@@ -69,14 +64,15 @@ const start = async (config) => {
                 hooksLib: hooks,
                 awsLib: aws,
                 pgLib: pg,
+                requestLib: request,
             },
             services: [
                 env,
                 pg,
                 require('./fetchq'),
                 require('./dates'),
-                // require('./aws'),
                 require('./storage-pg'),
+                require('./search-api'),
             ],
         })
 

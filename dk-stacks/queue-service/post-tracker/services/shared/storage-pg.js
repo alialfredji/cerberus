@@ -75,6 +75,38 @@ const putProfile = async (profileId, json) => {
     })
 }
 
+const getProfile = (profileId, options = {}) => {
+    const q = [
+        'SELECT * from ig_profile',
+        'WHERE profile_id = :profileId',
+        'ORDER BY created_at DESC',
+        'limit :limit',
+    ].join(' ')
+
+    return query(q, {
+        replacements: {
+            profileId,
+            limit: options.limit || 5,
+        },
+    })
+}
+
+const getProfilePosts = (profileId, options = {}) => {
+    const q = [
+        'SELECT * FROM ig_post',
+        'WHERE profile_id = :profileId',
+        'ORDER BY created_at DESC',
+        'LIMIT :limit',
+    ].join(' ')
+
+    return query(q, {
+        replacements: {
+            profileId,
+            limit: options.limit || 5,
+        },
+    })
+}
+
 const register = ({ registerAction, settings }) => {
     const { hooksLib, pgLib } = settings
     const { SERVICE, INIT_SERVICES } = hooksLib
@@ -98,4 +130,8 @@ module.exports = {
     putLocation,
     putPost,
     putProfile,
+
+    // find queries
+    getProfile,
+    getProfilePosts,
 }

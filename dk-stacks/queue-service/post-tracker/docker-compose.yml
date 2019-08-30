@@ -15,17 +15,13 @@ services:
             PG_USERNAME: ${PG_USERNAME-cerberus}
             PG_PASSWORD: ${PG_PASSWORD-cerberus}
             PG_DATABASE: ${PG_DATABASE-cerberus}
-            PG_MAX_CONN_ATTEMPTS: ${PG_MAX_CONN_ATTEMPTS-10}
-            PG_CONN_ATTEMPTS_DELAY: ${PG_CONN_ATTEMPTS_DELAY-10}
-            PG_DEBUG: ${PG_DEBUG-off}
             STORAGE_PG_HOST: ${STORAGE_PG_HOST-postgres}
             STORAGE_PG_PORT: ${STORAGE_PG_PORT-5432}
             STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
             STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
             STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}
-            STORAGE_PG_MAX_CONN_ATTEMPTS: ${STORAGE_PG_MAX_CONN_ATTEMPTS-10}
-            STORAGE_PG_CONN_ATTEMPTS_DELAY: ${STORAGE_PG_CONN_ATTEMPTS_DELAY-10}
-            STORAGE_PG_DEBUG: ${STORAGE_PG_DEBUG-off}
+            API_ENDPOINT: ${API_ENDPOINT-http://localhost:8080/api}
+            API_TOKEN: ${API_TOKEN-test-token}
         working_dir: /usr/src/app/post-tracker
         entrypoint: ["yarn", "start:prod"]
 

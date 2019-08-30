@@ -61,6 +61,8 @@ services:
             STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
             STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
             STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}
+            API_ENDPOINT: ${API_ENDPOINT-http://localhost:8080/api}
+            API_TOKEN: ${API_TOKEN-test-token}
         working_dir: /usr/src/app/discovery
         entrypoint: ["yarn", "start:dev"]
 
@@ -83,6 +85,8 @@ services:
             STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
             STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
             STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}
+            API_ENDPOINT: ${API_ENDPOINT-http://localhost:8080/api}
+            API_TOKEN: ${API_TOKEN-test-token}
         working_dir: /usr/src/app/first-blood
         entrypoint: ["yarn", "start:dev"]
 
@@ -105,6 +109,8 @@ services:
             STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
             STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
             STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}
+            API_ENDPOINT: ${API_ENDPOINT-http://localhost:8080/api}
+            API_TOKEN: ${API_TOKEN-test-token}
         working_dir: /usr/src/app/profile-tracker
         entrypoint: ["yarn", "start:dev"]
 
@@ -127,6 +133,8 @@ services:
             STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
             STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
             STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}
+            API_ENDPOINT: ${API_ENDPOINT-http://localhost:8080/api}
+            API_TOKEN: ${API_TOKEN-test-token}
         working_dir: /usr/src/app/post-tracker
         entrypoint: ["yarn", "start:dev"]
 
@@ -149,6 +157,8 @@ services:
             STORAGE_PG_USERNAME: ${STORAGE_PG_USERNAME-cerberus}
             STORAGE_PG_PASSWORD: ${STORAGE_PG_PASSWORD-cerberus}
             STORAGE_PG_DATABASE: ${STORAGE_PG_DATABASE-cerberus}
+            API_ENDPOINT: ${API_ENDPOINT-http://localhost:8080/api}
+            API_TOKEN: ${API_TOKEN-test-token}
         working_dir: /usr/src/app/profile-builder
         entrypoint: ["yarn", "start:dev"]
 
