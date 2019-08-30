@@ -25,7 +25,6 @@ const buildCachedProfile = (data) => ({
     is_buss: data.isBusinessAccount,
     is_verf: data.isVerified,
     is_pub: data.isPublic,
-    has_buss: data.isBusinessAccount,
 
     emails: data.emails,
 })

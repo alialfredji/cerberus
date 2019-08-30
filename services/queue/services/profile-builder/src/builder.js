@@ -1,10 +1,11 @@
 
-const workerName = 'profile-builder::profile'
+const workerName = 'profile-builder::builder'
 
 const storagePg = require('../../shared/storage-pg')
 
 const { delay } = require('../../shared/dates')
-const { profileBuilderDataModel } = require('./lib/profile-builder-data-model')
+const { builderDataModel } = require('./lib/builder-data-model')
+const builderNextIterationRules = require('./lib/builder-nextIteration-rules')
 const { buildElsProfile } = require('./lib/build-els-profile')
 const { buildCachedProfile } = require('./lib/build-cached-profile')
 const { execRaw, queries: apiQueries } = require('../../shared/search-api')
@@ -26,7 +27,7 @@ const handler = async (doc, { ctx }) => {
 
     let dataModel = null
     try {
-        dataModel = await profileBuilderDataModel({
+        dataModel = await builderDataModel({
             postData: queries[1][0],
             profileData: queries[0][0],
         })
@@ -37,7 +38,11 @@ const handler = async (doc, { ctx }) => {
 
     if (dataModel === null) {
         ctx.logger.verbose(`[${workerName}] profile data not found`)
-        return { action: 'drop' }
+        return {
+            action: 'reschedule',
+            nextIteration: delay(1, 'week'),
+            payload: doc.payload,
+        } 
     }
 
     // dont update profile data if not public
@@ -71,7 +76,11 @@ const handler = async (doc, { ctx }) => {
         throw new Error(`set cached profile: ${err.message}`)
     }
 
-    return { action: 'drop' }
+    return {
+        action: 'reschedule',
+        nextIteration: builderNextIterationRules(dataModel),
+        payload: doc.payload,
+    } 
 }
 
 module.exports = {

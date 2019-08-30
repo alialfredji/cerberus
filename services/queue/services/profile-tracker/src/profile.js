@@ -195,7 +195,7 @@ const handler = async (doc, { ctx, }) => {
         await ctx.doc.push('profile_lang', {
             subject: doc.payload.i,
             payload: {},
-            nextIteration: delay(2, 'hours'),
+            nextIteration: delay(1, 'hours'),
         })
 
         await ctx.doc.push('profile_builder', {

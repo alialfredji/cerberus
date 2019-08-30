@@ -106,7 +106,7 @@ const findEmails = (bio) => {
     return emails || []
 } 
 
-const profileBuilderDataModel = ({ profileData, postData }) => {
+const builderDataModel = ({ profileData, postData }) => {
     if (!profileData || !profileData.length) {
         return null
     }
@@ -146,11 +146,11 @@ const profileBuilderDataModel = ({ profileData, postData }) => {
         latestProfile[4],
         ...(output.postsList.map(item => item.caption)),
     ].join(' ')
-        .replace(emojisRegex, '') // emojis
-        .replace(httpUrlRegex, '') // http/https url
-        .replace(wwwUrlRegex, '') // www url
-        .replace(emailRegex, '') // email
-        .replace(numbersRegex, '') // numbers
+        // .replace(emojisRegex, '') // emojis
+        // .replace(httpUrlRegex, '') // http/https url
+        // .replace(wwwUrlRegex, '') // www url
+        // .replace(emailRegex, '') // email
+        // .replace(numbersRegex, '') // numbers
         .replace(punctuationRegex, '') // punctuation
         .replace(extraSpacesRegex, '') // extra spaces
         .replace(newLinesRegex, ' ') // new lines
@@ -159,6 +159,6 @@ const profileBuilderDataModel = ({ profileData, postData }) => {
 }
 
 module.exports = {
-    profileBuilderDataModel,
+    builderDataModel,
 }
 
