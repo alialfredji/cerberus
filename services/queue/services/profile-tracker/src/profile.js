@@ -191,9 +191,20 @@ const handler = async (doc, { ctx, }) => {
         await ctx.doc.pushMany('post_tracker', {
             docs: data.postsList.map(post => ([post.code]))
         })
+
+        await ctx.doc.push('profile_lang', {
+            subject: doc.payload.i,
+            payload: {},
+            nextIteration: delay(2, 'hours'),
+        })
+
+        await ctx.doc.push('profile_builder', {
+            subject: doc.payload.i,
+            payload: {},
+            nextIteration: delay(2, 'hours'),
+        })
     } catch (err) {
-        ctx.logger.error(`[${workerName}] push(post_tracker): ${err.message}`)
-        throw new Error(`push(post_tracker): ${err.message}`)
+        ctx.logger.error(`[${workerName}] push queues: ${err.message}`)
     }
 
     return {

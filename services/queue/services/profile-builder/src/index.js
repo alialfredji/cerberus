@@ -6,6 +6,7 @@ const fetchq = require('fetchq')
 const moment = require('moment')
 const aws = require('aws-sdk')
 const pg = require('@forrestjs/service-postgres')
+const request = require('superagent')
 
 require('../../shared/worker-node').start({
     libs: {
@@ -16,22 +17,28 @@ require('../../shared/worker-node').start({
         hooks,
         aws,
         pg,
+        request,
     },
     queues: {
         'profile_builder': {},
+        'profile_lang': {},
     },
     workers: [
-        require('./profile'),
-        // require('./profile'),
-        // require('./post-tracker'),
-        // require('./post-tracker'),
-        // require('./post-tracker'),
-        // require('./post-tracker'),
+        require('./builder'),
     ],
 })
 
-setTimeout(() => {
-    require('./profile').handler({
-        subject: 285323558,
-    }, {})
-}, 1000)
+// setTimeout(() => {
+//     require('./profile').handler({
+//         subject: 285323558,
+//     }, {
+//         ctx: {
+//             logger: {
+//                 error: () => null,
+//                 verbose: () => null,
+//                 info: () => null,
+//                 debug: () => null,
+//             },
+//         }
+//     })
+// }, 1000)

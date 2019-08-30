@@ -20,6 +20,8 @@ require('../../shared/worker-node').start({
     queues: {
         'profile_tracker': {},
         'lost_profile': {},
+        'profile_builder': {},
+        'profile_lang': {},
         // 'post_tracker': {},
     },
     workers: [

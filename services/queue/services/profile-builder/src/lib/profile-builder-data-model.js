@@ -1,4 +1,23 @@
 
+const {
+    emojisRegex,
+    hashtagsRegex,
+    mentionsRegex,
+    punctuationRegex,
+    extraSpacesRegex,
+    newLinesRegex,
+    httpUrlRegex,
+    wwwUrlRegex,
+    emailRegex,
+    numbersRegex,
+} = require('./string-utils')
+
+const languages = require('./languages')
+
+const languagesMap = languages.reduce((acc, curr) => ({
+    ...acc,
+    [curr.id]: curr,
+}), {})
 
 const structuredPostsList = (postData) => {
     const uniquePosts = []
@@ -83,8 +102,7 @@ const calcEngagementRate = ({ followers, avgComments, avgLikes }) => {
 }
 
 const findEmails = (bio) => {
-    const regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g
-    const emails = (bio || '').match(regex)
+    const emails = (bio || '').match(emailRegex)
     return emails || []
 } 
 
@@ -112,6 +130,8 @@ const profileBuilderDataModel = ({ profileData, postData }) => {
     output.followers = latestProfile[10]
     output.followings = latestProfile[11]
     output.isBusinessAccount = latestProfile[13][0] || false
+    output.langCode = null
+    output.langName = output.langCode && languagesMap[output.langCode] ? languagesMap[output.langCode].name : null,
     output.postsList = structuredPostsList(postData)
     output.followersGrowth = calcFollowersGrowth(latestMonthProfileData)
     output.uploadsMonth = calcUploadsMonth(latestMonthProfileData)
@@ -126,6 +146,14 @@ const profileBuilderDataModel = ({ profileData, postData }) => {
         latestProfile[4],
         ...(output.postsList.map(item => item.caption)),
     ].join(' ')
+        .replace(emojisRegex, '') // emojis
+        .replace(httpUrlRegex, '') // http/https url
+        .replace(wwwUrlRegex, '') // www url
+        .replace(emailRegex, '') // email
+        .replace(numbersRegex, '') // numbers
+        .replace(punctuationRegex, '') // punctuation
+        .replace(extraSpacesRegex, '') // extra spaces
+        .replace(newLinesRegex, ' ') // new lines
 
     return output
 }
