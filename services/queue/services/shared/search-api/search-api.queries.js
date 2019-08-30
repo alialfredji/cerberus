@@ -17,7 +17,7 @@ module.exports = {
         mutation setCachedProfile (
             $token: String!
             $id: ID!
-            $body: JSON
+            $body: memcachedProfile_setProfileBodyInput!
         ) {
             session (token: $token) {
                 memcachedProfile {

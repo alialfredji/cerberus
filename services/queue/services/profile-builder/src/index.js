@@ -29,7 +29,7 @@ require('../../shared/worker-node').start({
 })
 
 // setTimeout(() => {
-//     require('./profile').handler({
+//     require('./builder').handler({
 //         subject: 285323558,
 //     }, {
 //         ctx: {

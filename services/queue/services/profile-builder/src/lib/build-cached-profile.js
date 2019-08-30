@@ -26,6 +26,9 @@ const buildCachedProfile = (data) => ({
     is_verf: data.isVerified,
     is_pub: data.isPublic,
 
+    pp_mtime: data.lastPostUpdate,
+    p_mtime: data.lastProfileUpdate,
+
     emails: data.emails,
 })
 

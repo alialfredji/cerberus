@@ -140,13 +140,15 @@ const builderDataModel = ({ profileData, postData }) => {
     output.emails = findEmails(output.biography)
     output.engagementRate = calcEngagementRate(output)
     output.postPrice = calcPostPrice(output)
+    output.lastPostUpdate = postData[0] ? postData[0].created_at : null
+    output.lastProfileUpdate = profileData[0].created_at
     output.fullText = [
         latestProfile[1],
         latestProfile[2],
         latestProfile[4],
         ...(output.postsList.map(item => item.caption)),
     ].join(' ')
-        // .replace(emojisRegex, '') // emojis
+        .replace(emojisRegex, '') // emojis
         // .replace(httpUrlRegex, '') // http/https url
         // .replace(wwwUrlRegex, '') // www url
         // .replace(emailRegex, '') // email

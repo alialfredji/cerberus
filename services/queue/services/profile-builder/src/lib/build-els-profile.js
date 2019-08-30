@@ -17,8 +17,11 @@ const buildElsProfile = (data) => ({
 
     has_email: !!data.emails.length,
     has_buss: data.isBusinessAccount,
+    is_verf: data.isVerified,
+    is_pub: data.isPublic,
 
-    updated_at: new Date(),
+    pp_mtime: data.lastPostUpdate,
+    p_mtime: data.lastProfileUpdate,
 })
 
 module.exports = {
